@@ -1,0 +1,21 @@
+www.halfcon.site/:1 Access to fetch at 'https://api.halfcon.site/api/api/services' from origin 'https://www.halfcon.site' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+api.halfcon.site/api/api/services:1  Failed to load resource: net::ERR_FAILED
+index-Dp_pqnX6.js:67   Uncaught (in promise) TypeError: Failed to fetch
+    at K (index-Dp_pqnX6.js:67:2854)
+    at Object.list (index-Dp_pqnX6.js:67:3333)
+    at index-Dp_pqnX6.js:67:10471
+    at Pl (index-Dp_pqnX6.js:40:24178)
+    at an (index-Dp_pqnX6.js:40:42110)
+    at index-Dp_pqnX6.js:40:40465
+    at C (index-Dp_pqnX6.js:25:1562)
+    at MessagePort.kn (index-Dp_pqnX6.js:25:1930)
+register:1 [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) <input type=​"password" class=​"input" required value>​
+client:383 Cross-Origin-Opener-Policy policy would block the window.postMessage call.
+Uu @ client:383
+client:383 Cross-Origin-Opener-Policy policy would block the window.postMessage call.
+Uu @ client:383
+register:1 Access to fetch at 'https://api.halfcon.site/api/api/auth/google' from origin 'https://www.halfcon.site' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+api.halfcon.site/api/api/auth/google:1  Failed to load resource: net::ERR_FAILED
+installHook.js:1 [GSI_LOGGER]: google.accounts.id.initialize() is called multiple times. This could cause unexpected behavior and only the last initialized instance will be used.
+overrideMethod @ installHook.js:1
+button?theme=outline&size=large&width=320&text=continue_with&is_fedcm_supported=true&client_id=7169…:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2
