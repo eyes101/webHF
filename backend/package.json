@@ -1,0 +1,16 @@
+{
+  "name": "halfcon-backend",
+  "version": "1.0.0",
+  "description": "Halfcon company backend API",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/config/seed.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {}
+}
