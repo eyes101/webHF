@@ -7,9 +7,9 @@ import { whatsappLink } from '../config/contacts';
 import './HomePage.css';
 
 const CATEGORY_CONFIG = {
-  logistics: { color: '#3b82f6', bg: '#eff6ff', strip: '#3b82f6', icon: '🚚' },
-  'special-duties': { color: '#16a34a', bg: '#f0fdf4', strip: '#16a34a', icon: '🛡️' },
-  property: { color: '#f97316', bg: '#fff7ed', strip: '#f97316', icon: '🏢' },
+  electrical: { color: '#f59e0b', bg: '#fef3c7', strip: '#f59e0b', icon: '⚡' },
+  'home-management': { color: '#8b5cf6', bg: '#f3e8ff', strip: '#8b5cf6', icon: '🏠' },
+  'office-management': { color: '#06b6d4', bg: '#cffafe', strip: '#06b6d4', icon: '🏢' },
 };
 
 function getCategoryConfig(category) {
@@ -48,17 +48,17 @@ export default function HomePage() {
               <span className="hero-badge-dot">
                 <span className="hero-badge-ping" />
               </span>
-              Nigeria's Most Reliable Logistics
+              Nigeria's Most Trusted Service Provider
             </div>
 
             <h1 className="hero-title">
-              Seamless <span className="hero-title-accent">delivery</span> &amp;<br />
-              premium services.
+              Complete <span className="hero-title-accent">care</span> &amp;<br />
+              professional services.
             </h1>
 
             <p className="hero-desc">
-              From express nationwide logistics to property development and special duties.
-              We connect Nigeria with speed and trust.
+              From electrical solutions to comprehensive home and office management.
+              We deliver excellence and reliability across Nigeria.
             </p>
 
             <div className="hero-ctas">
@@ -66,7 +66,7 @@ export default function HomePage() {
                 Request Service
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 [...]
               </Link>
-              <Link to="/services" className="cta-secondary">Track Package</Link>
+              <Link to="/services" className="cta-secondary">Browse Services</Link>
             </div>
 
             <div className="hero-trust">
@@ -90,7 +90,7 @@ export default function HomePage() {
             <div className="hero-img-ring hero-img-ring-2" />
             <img
               src="/hero.png"
-              alt="Halfcon delivery and logistics"
+              alt="Professional services"
               className="hero-img"
               onError={(e) => { e.target.style.display = 'none'; }}
             />
@@ -99,7 +99,7 @@ export default function HomePage() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/[...]
               </div>
               <div>
-                <div className="hero-float-label">Deliveries Today</div>
+                <div className="hero-float-label">Services Today</div>
                 <div className="hero-float-num">2,450+</div>
               </div>
             </div>
@@ -150,16 +150,16 @@ export default function HomePage() {
       <section className="how-section">
         <div className="section-inner how-inner">
           <div className="how-steps-col">
-            <h2 className="section-title">How Halfcon works</h2>
+            <h2 className="section-title">How we work</h2>
             <p className="section-desc" style={{ marginBottom: '48px' }}>
-              We've streamlined our process to ensure your packages and service requests are handled with maximum efficiency and care.
+              We've streamlined our process to ensure your service requests are handled with maximum efficiency and professionalism.
             </p>
 
             <div className="steps">
               {[
-                { n: '1', title: 'Book a Service', desc: 'Enter your details, select your required service (logistics, duties, or property), and get an instant quote.' },
-                { n: '2', title: 'We Process & Assign', desc: 'Our system instantly assigns the nearest qualified agent or vehicle to handle your specific request securely.' },
-                { n: '3', title: 'Track & Complete', desc: 'Monitor progress in real-time. Receive notifications upon successful delivery or project completion.' },
+                { n: '1', title: 'Book a Service', desc: 'Enter your details, select your required service (electrical, home, or office management), and get an instant quote.' },
+                { n: '2', title: 'We Process & Assign', desc: 'Our system instantly assigns the nearest qualified professional to handle your specific request.' },
+                { n: '3', title: 'Track & Complete', desc: 'Monitor progress in real-time. Receive notifications upon successful completion of your service.' },
               ].map((step) => (
                 <div key={step.n} className="step">
                   <div className="step-num">{step.n}</div>
@@ -175,9 +175,9 @@ export default function HomePage() {
           <div className="how-cta-col">
             <div className="cta-panel">
               <div className="cta-panel-glow" />
-              <h3 className="cta-panel-title">Ready to move with us?</h3>
+              <h3 className="cta-panel-title">Ready to work with us?</h3>
               <p className="cta-panel-desc">
-                Join thousands of businesses and individuals who trust Halfcon for their daily logistics and special operations in Nigeria.
+                Join thousands of businesses and individuals who trust us for their electrical, home, and office management needs across Nigeria.
               </p>
               <Link to="/register" className="cta-panel-btn-solid">Create an Account</Link>
               <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="cta-panel-btn-outline">
