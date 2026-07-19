@@ -36,7 +36,7 @@ export default function GoogleSignInButton({ onToken, onError }) {
       });
     }
     tryInit();
-  }, []);
+  }, [onToken, onError]);
 
   return <div ref={buttonRef} style={{ display: 'flex', justifyContent: 'center' }} />;
 }

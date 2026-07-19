@@ -12,7 +12,5 @@
   "engines": {
     "node": ">=22.5.0"
   },
-  "dependencies": {
-    "cors": "^2.8.5"
-  }
+  "dependencies": {}
 }

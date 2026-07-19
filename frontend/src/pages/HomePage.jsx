@@ -7,9 +7,9 @@ import { whatsappLink } from '../config/contacts';
 import './HomePage.css';
 
 const CATEGORY_CONFIG = {
-  electrical: { color: '#f59e0b', bg: '#fef3c7', strip: '#f59e0b', icon: '⚡' },
-  'home-management': { color: '#8b5cf6', bg: '#f3e8ff', strip: '#8b5cf6', icon: '🏠' },
-  'office-management': { color: '#06b6d4', bg: '#cffafe', strip: '#06b6d4', icon: '🏢' },
+  logistics: { color: '#3b82f6', bg: '#eff6ff', strip: '#3b82f6', icon: '🚚' },
+  'special-duties': { color: '#16a34a', bg: '#f0fdf4', strip: '#16a34a', icon: '🛡️' },
+  property: { color: '#f97316', bg: '#fff7ed', strip: '#f97316', icon: '🏢' },
 };
 
 function getCategoryConfig(category) {
@@ -29,7 +29,11 @@ export default function HomePage() {
   useEffect(() => {
     api.services.list()
       .then((res) => {
-        setServices(res.services);
+        const unique = {};
+        res.services.forEach((s) => {
+          if (!unique[s.category]) unique[s.category] = s;
+        });
+        setServices(Object.values(unique).slice(0, 3));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -48,38 +52,38 @@ export default function HomePage() {
               <span className="hero-badge-dot">
                 <span className="hero-badge-ping" />
               </span>
-              Nigeria's Most Trusted Service Provider
+              Nigeria's Most Reliable Logistics
             </div>
 
             <h1 className="hero-title">
-              Complete <span className="hero-title-accent">care</span> &amp;<br />
-              professional services.
+              Seamless <span className="hero-title-accent">delivery</span> &amp;<br />
+              premium services.
             </h1>
 
             <p className="hero-desc">
-              From electrical solutions to comprehensive home and office management.
-              We deliver excellence and reliability across Nigeria.
+              From express nationwide logistics to property development and special duties.
+              We connect Nigeria with speed and trust.
             </p>
 
             <div className="hero-ctas">
               <Link to="/services" className="cta-primary">
                 Request Service
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 ..."/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </Link>
-              <Link to="/services" className="cta-secondary">Browse Services</Link>
+              <Link to="/services" className="cta-secondary">Track Package</Link>
             </div>
 
             <div className="hero-trust">
               <div className="trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9..."/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 Nationwide
               </div>
               <div className="trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9..."/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 24/7 Support
               </div>
               <div className="trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9..."/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 Secure
               </div>
             </div>
@@ -90,52 +94,19 @@ export default function HomePage() {
             <div className="hero-img-ring hero-img-ring-2" />
             <img
               src="/hero.png"
-              alt="Professional services"
+              alt="Halfcon delivery and logistics"
               className="hero-img"
               onError={(e) => { e.target.style.display = 'none'; }}
             />
             <div className="hero-float-badge">
               <div className="hero-float-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
               </div>
               <div>
-                <div className="hero-float-label">Services Today</div>
+                <div className="hero-float-label">Deliveries Today</div>
                 <div className="hero-float-num">2,450+</div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== FEATURED ===== */}
-      <section className="featured-section">
-        <div className="wrap">
-          <div className="section-header">
-            <h2 className="section-title">Featured services</h2>
-            <p className="section-desc">Electrical, Home Management, and Office Management — our most requested service lines.</p>
-          </div>
-
-          <div className="featured-grid">
-            {['electrical', 'home-management', 'office-management'].map((key) => {
-              const cfg = getCategoryConfig(key);
-              const title = key === 'electrical' ? 'Electrical' : key === 'home-management' ? 'Home Management' : 'Office Management';
-              return (
-                <Link
-                  key={key}
-                  to={`/services?category=${encodeURIComponent(key)}`}
-                  className="featured-card"
-                  style={{ '--strip-color': cfg.strip, '--icon-color': cfg.color, '--icon-bg': cfg.bg }}
-                >
-                  <div className="featured-card-strip" />
-                  <div className="featured-card-icon" style={{ background: cfg.bg, color: cfg.color }}>
-                    <span style={{ fontSize: '28px' }}>{cfg.icon}</span>
-                  </div>
-                  <h3 className="featured-card-title">{title}</h3>
-                  <p className="featured-card-desc">Professional {title.toLowerCase()} solutions for homes and businesses.</p>
-                  <div className="featured-card-cta" style={{ color: cfg.color }}>Explore →</div>
-                </Link>
-              );
-            })}
           </div>
         </div>
       </section>
@@ -152,15 +123,17 @@ export default function HomePage() {
             <div className="services-loading">Loading services…</div>
           ) : (
             <div className="services-grid">
-              {services.map((s) => {
+              {services.map((s, i) => {
                 const cfg = getCategoryConfig(s.category);
+                const isCenter = i === 1;
                 return (
                   <Link
                     key={s.id}
                     to={`/services/${s.slug}`}
-                    className="service-card"
+                    className={`service-card${isCenter ? ' service-card-featured' : ''}`}
                     style={{ '--strip-color': cfg.strip, '--icon-color': cfg.color, '--icon-bg': cfg.bg }}
                   >
+                    {isCenter && <div className="service-card-popular">Popular</div>}
                     <div className="service-card-strip" />
                     <div className="service-card-icon">
                       <span style={{ fontSize: '26px' }}>{cfg.icon}</span>
@@ -183,16 +156,16 @@ export default function HomePage() {
       <section className="how-section">
         <div className="section-inner how-inner">
           <div className="how-steps-col">
-            <h2 className="section-title">How we work</h2>
+            <h2 className="section-title">How Halfcon works</h2>
             <p className="section-desc" style={{ marginBottom: '48px' }}>
-              We've streamlined our process to ensure your service requests are handled with maximum efficiency and professionalism.
+              We've streamlined our process to ensure your packages and service requests are handled with maximum efficiency and care.
             </p>
 
             <div className="steps">
               {[
-                { n: '1', title: 'Book a Service', desc: 'Enter your details, select your required service (electrical, home, or office management), and get an instant quote.' },
-                { n: '2', title: 'We Process & Assign', desc: 'Our system instantly assigns the nearest qualified professional to handle your specific request.' },
-                { n: '3', title: 'Track & Complete', desc: 'Monitor progress in real-time. Receive notifications upon successful completion of your service.' },
+                { n: '1', title: 'Book a Service', desc: 'Enter your details, select your required service (logistics, duties, or property), and get an instant quote.' },
+                { n: '2', title: 'We Process & Assign', desc: 'Our system instantly assigns the nearest qualified agent or vehicle to handle your specific request securely.' },
+                { n: '3', title: 'Track & Complete', desc: 'Monitor progress in real-time. Receive notifications upon successful delivery or project completion.' },
               ].map((step) => (
                 <div key={step.n} className="step">
                   <div className="step-num">{step.n}</div>
@@ -208,9 +181,9 @@ export default function HomePage() {
           <div className="how-cta-col">
             <div className="cta-panel">
               <div className="cta-panel-glow" />
-              <h3 className="cta-panel-title">Ready to work with us?</h3>
+              <h3 className="cta-panel-title">Ready to move with us?</h3>
               <p className="cta-panel-desc">
-                Join thousands of businesses and individuals who trust us for their electrical, home, and office management needs across Nigeria.
+                Join thousands of businesses and individuals who trust Halfcon for their daily logistics and special operations in Nigeria.
               </p>
               <Link to="/register" className="cta-panel-btn-solid">Create an Account</Link>
               <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="cta-panel-btn-outline">
@@ -218,11 +191,11 @@ export default function HomePage() {
               </a>
               <div className="cta-panel-footer">
                 <div className="cta-panel-detail">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13..."/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   Lagos, Abuja, PH
                 </div>
                 <div className="cta-panel-detail">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   24/7 Operations
                 </div>
               </div>
