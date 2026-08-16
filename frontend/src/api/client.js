@@ -11,9 +11,12 @@
 // Vite only exposes env vars prefixed with VITE_ to client-side code, and
 // only bakes them in at BUILD time — so this must be set in Vercel's
 // project settings BEFORE building, not as a runtime secret.
-const API_BASE = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/api`
-  : '/api';
+const API_BASE = (() => {
+  const raw = import.meta.env.VITE_API_URL;
+  if (!raw) return '/api';
+  const clean = raw.replace(/\/+$|\s+/g, ''); // remove trailing slashes and accidental whitespace
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+})();
 
 async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
