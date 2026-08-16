@@ -1,7 +1,7 @@
 // seed.js — populates initial Halfcon services + a default staff/admin login.
 // Run with: npm run seed
 import { db } from './db.js';
-import { hashPassword, newId } from '../middleware/auth-crypto.js';
+import { newId } from '../middleware/auth-crypto.js';
 
 function slugify(text) {
   return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -44,15 +44,21 @@ for (const [category, name, description, priceUsd, unit] of SERVICES) {
 }
 console.log(`Inserted ${count} services (skipped duplicates).`);
 
-console.log('Seeding default staff account...');
+console.log('Seeding default staff account placeholder...');
+// Sign-in is handled entirely by Firebase now (see routes/auth.js), so there's
+// no password to set here. This row just reserves the admin role for that
+// email — create a Firebase user with the SAME email (Firebase console →
+// Authentication → Add user, or have them register normally on the site),
+// and on their first sign-in auth.js will match this row by email and
+// attach their Firebase UID to it, giving them the admin role automatically.
 const staffEmail = 'admin@halfcon.it.com';
 const existingStaff = db.prepare('SELECT id FROM users WHERE email = ?').get(staffEmail);
 if (!existingStaff) {
-  const { hash, salt } = hashPassword('ChangeThisPassword123!');
-  db.prepare(`INSERT INTO users (id, name, email, password_hash, password_salt, role)
-              VALUES (?, 'Halfcon Admin', ?, ?, ?, 'admin')`)
-    .run(newId(), staffEmail, hash, salt);
-  console.log(`Created admin account: ${staffEmail} / ChangeThisPassword123!  (CHANGE THIS PASSWORD IMMEDIATELY)`);
+  db.prepare(`INSERT INTO users (id, name, email, role)
+              VALUES (?, 'Halfcon Admin', ?, 'admin')`)
+    .run(newId(), staffEmail);
+  console.log(`Reserved admin role for: ${staffEmail}`);
+  console.log(`→ Create a Firebase user with this exact email (any password) to activate admin access.`);
 } else {
   console.log('Admin account already exists, skipping.');
 }

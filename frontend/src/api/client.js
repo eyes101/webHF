@@ -30,28 +30,16 @@ async function apiFetch(endpoint, options = {}) {
 
 export const api = {
   auth: {
-    register: (name, email, password, phone) =>
-      apiFetch('/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ name, email, password, phone }),
-      }),
-    login: (email, password) =>
-      apiFetch('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      }),
-    google: (idToken) =>
-      apiFetch('/auth/google', {
+    // Called after ANY Firebase sign-in (Google, Facebook, email/password)
+    // succeeds on the client — exchanges the Firebase ID token for our own
+    // session cookie, which is what the rest of the app's API calls use.
+    firebaseSession: (idToken) =>
+      apiFetch('/auth/firebase-session', {
         method: 'POST',
         body: JSON.stringify({ id_token: idToken }),
       }),
     getMe: () => apiFetch('/auth/me'),
     logout: () => apiFetch('/auth/logout', { method: 'POST' }),
-    changePassword: (current_password, new_password) =>
-      apiFetch('/auth/change-password', {
-        method: 'POST',
-        body: JSON.stringify({ current_password, new_password }),
-      }),
   },
   services: {
     list: (category) =>

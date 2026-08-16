@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api/client';
+import { auth } from '../config/firebase';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -11,7 +12,11 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const isGoogleAccount = user?.auth_provider === 'google';
+  // Password changes only make sense for accounts that HAVE a password —
+  // Google/Facebook-only accounts have nothing to change here. Firebase
+  // tracks this per sign-in method on the current user's providerData.
+  const currentUser = auth.currentUser;
+  const hasPasswordProvider = currentUser?.providerData?.some((p) => p.providerId === 'password');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,20 +27,29 @@ export default function SettingsPage() {
       setError('New password and confirmation do not match.');
       return;
     }
-    if (newPassword.length < 8) {
-      setError('New password must be at least 8 characters.');
+    if (newPassword.length < 6) {
+      setError('New password must be at least 6 characters.');
       return;
     }
 
     setLoading(true);
     try {
-      await api.auth.changePassword(currentPassword, newPassword);
+      // Firebase requires a recent sign-in before allowing a password
+      // change — re-verify with their current password first.
+      const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+      await reauthenticateWithCredential(currentUser, credential);
+      await updatePassword(currentUser, newPassword);
       setSuccess('Password changed successfully.');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err.message || 'Failed to change password.');
+      const map = {
+        'auth/wrong-password': 'Current password is incorrect.',
+        'auth/invalid-credential': 'Current password is incorrect.',
+        'auth/too-many-requests': 'Too many attempts — please wait a moment and try again.',
+      };
+      setError(map[err.code] || err.message || 'Failed to change password.');
     } finally {
       setLoading(false);
     }
@@ -50,9 +64,9 @@ export default function SettingsPage() {
 
       <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>Change password</h2>
 
-      {isGoogleAccount ? (
+      {!hasPasswordProvider ? (
         <p style={{ color: '#666' }}>
-          This account signs in with Google, so there's no password to change here.
+          This account signs in with Google or Facebook, so there's no password to change here.
         </p>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -78,7 +92,7 @@ export default function SettingsPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
-              minLength={8}
+              minLength={6}
             />
           </div>
           <div style={{ marginBottom: '20px' }}>
@@ -91,7 +105,7 @@ export default function SettingsPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={8}
+              minLength={6}
             />
           </div>
 

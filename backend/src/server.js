@@ -24,5 +24,5 @@ registerMessageRoutes(app);
 app.listen(PORT, () => {
   console.log(`Halfcon backend running on http://localhost:${PORT}`);
   console.log(`Payment provider mode: ${process.env.PAYMENT_PROVIDER || 'manual (test mode)'}`);
-  console.log(`Google sign-in: ${process.env.GOOGLE_CLIENT_ID ? 'configured' : 'NOT configured (set GOOGLE_CLIENT_ID to enable)'}`);
+  console.log(`Firebase sign-in: ${process.env.FIREBASE_PROJECT_ID ? `configured (project: ${process.env.FIREBASE_PROJECT_ID})` : 'NOT configured (set FIREBASE_PROJECT_ID to enable)'}`);
 });
