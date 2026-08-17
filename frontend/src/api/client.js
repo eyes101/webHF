@@ -1,31 +1,27 @@
 // api/client.js
 //
-// In local development, API_BASE is left as '/api' and Vite's dev proxy
-// (see vite.config.js) forwards those requests to localhost:4000.
-//
-// In production (deployed on Vercel), there is no dev proxy, so we need the
-// full backend URL. Set VITE_API_URL in Vercel's environment variables to
-// your Railway backend's public URL, e.g.:
-//   VITE_API_URL=https://new-halfcon-production.up.railway.app
-//
-// Vite only exposes env vars prefixed with VITE_ to client-side code, and
-// only bakes them in at BUILD time — so this must be set in Vercel's
-// project settings BEFORE building, not as a runtime secret.
-const API_BASE = (() => {
-  const raw = import.meta.env.VITE_API_URL;
-  if (!raw) return '/api';
-  const clean = raw.replace(/\/+$|\s+/g, ''); // remove trailing slashes and accidental whitespace
-  return clean.endsWith('/api') ? clean : `${clean}/api`;
-})();
+// Every request now carries a Firebase ID token in the Authorization header
+// instead of a session cookie — Cloud Functions verifies it per-request (see
+// functions/src/middleware/requireAuth.js). Firebase tokens expire hourly,
+// so we always fetch a fresh one via getIdToken() right before each call —
+// the Firebase SDK caches/refreshes under the hood, so this is cheap and
+// avoids ever sending a stale token.
+import { auth } from '../config/firebase';
+
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/api`
+  : '/api';
 
 async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
-  const config = {
-    credentials: 'include', // send/receive the session cookie cross-origin
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options,
-  };
-  const res = await fetch(url, config);
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+
+  if (auth.currentUser) {
+    const idToken = await auth.currentUser.getIdToken();
+    headers.Authorization = `Bearer ${idToken}`;
+  }
+
+  const res = await fetch(url, { ...options, headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `API error: ${res.status}`);
   return data;
@@ -33,16 +29,7 @@ async function apiFetch(endpoint, options = {}) {
 
 export const api = {
   auth: {
-    // Called after ANY Firebase sign-in (Google, Facebook, email/password)
-    // succeeds on the client — exchanges the Firebase ID token for our own
-    // session cookie, which is what the rest of the app's API calls use.
-    firebaseSession: (idToken) =>
-      apiFetch('/auth/firebase-session', {
-        method: 'POST',
-        body: JSON.stringify({ id_token: idToken }),
-      }),
     getMe: () => apiFetch('/auth/me'),
-    logout: () => apiFetch('/auth/logout', { method: 'POST' }),
   },
   services: {
     list: (category) =>

@@ -56,8 +56,8 @@ export default function HomePage() {
             </div>
 
             <h1 className="hero-title">
-              House Care and<br />
-              Properties Management.
+              Seamless <span className="hero-title-accent">delivery</span> &amp;<br />
+              premium services.
             </h1>
 
             <p className="hero-desc">
@@ -100,7 +100,7 @@ export default function HomePage() {
             />
             <div className="hero-float-badge">
               <div className="hero-float-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
               </div>
               <div>
                 <div className="hero-float-label">Deliveries Today</div>
@@ -191,11 +191,11 @@ export default function HomePage() {
               </a>
               <div className="cta-panel-footer">
                 <div className="cta-panel-detail">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   Lagos, Abuja, PH
                 </div>
                 <div className="cta-panel-detail">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   24/7 Operations
                 </div>
               </div>
