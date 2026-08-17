@@ -11,6 +11,7 @@ import cors from 'cors';
 
 import { registerAuthRoutes } from './src/routes/auth.js';
 import { registerServiceRoutes } from './src/routes/services.js';
+import { registerArtisanRoutes } from './src/routes/artisans.js';
 import { registerOrderRoutes } from './src/routes/orders.js';
 import { registerPaymentRoutes } from './src/routes/payments.js';
 import { registerMessageRoutes } from './src/routes/messages.js';
@@ -30,6 +31,7 @@ app.get('/api/health', (req, res) => {
 
 registerAuthRoutes(app);
 registerServiceRoutes(app);
+registerArtisanRoutes(app);
 registerOrderRoutes(app);
 registerPaymentRoutes(app);
 registerMessageRoutes(app);

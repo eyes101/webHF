@@ -13,7 +13,7 @@ export default function StaffDashboard() {
         Staff dashboard
       </h1>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '30px', borderBottom: '2px solid var(--ink)', paddingBottom: '12px' }}>
-        {['orders', 'services', 'payments', 'customers'].map((t) => (
+        {['orders', 'services', 'artisans', 'payments', 'customers'].map((t) => (
           <button
             key={t}
             className={`btn ${tab === t ? 'btn-solid' : ''}`}
@@ -25,6 +25,7 @@ export default function StaffDashboard() {
       </div>
       {tab === 'orders' && <OrdersTab />}
       {tab === 'services' && <ServicesTab />}
+      {tab === 'artisans' && <ArtisansTab />}
       {tab === 'payments' && <PaymentsTab />}
       {tab === 'customers' && <CustomersTab />}
     </div>
@@ -261,6 +262,124 @@ function ServicesTab() {
                 <td style={{ padding: '10px' }}>
                   <button className="btn btn-sm" onClick={() => toggleActive(s)}>
                     {s.active ? 'Deactivate' : 'Activate'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+function ArtisansTab() {
+  const [artisans, setArtisans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: '', trade: '', services_offered: '', phone: '', bio: '' });
+
+  const load = () => {
+    setLoading(true);
+    api.artisans.adminList().then((res) => setArtisans(res.artisans)).finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    try {
+      await api.artisans.adminCreate({
+        name: form.name,
+        trade: form.trade,
+        services_offered: form.services_offered.split(',').map((s) => s.trim()).filter(Boolean),
+        phone: form.phone || null,
+        bio: form.bio || null,
+      });
+      setForm({ name: '', trade: '', services_offered: '', phone: '', bio: '' });
+      setShowForm(false);
+      load();
+    } catch (err) {
+      alert('Error creating artisan: ' + err.message);
+    }
+  };
+
+  const toggleActive = async (artisan) => {
+    try {
+      await api.artisans.adminUpdate(artisan.id, { active: !artisan.active });
+      load();
+    } catch (err) {
+      alert('Error updating artisan: ' + err.message);
+    }
+  };
+
+  return (
+    <div>
+      <button className="btn btn-solid" onClick={() => setShowForm(!showForm)} style={{ marginBottom: '20px' }}>
+        {showForm ? 'Cancel' : '+ Add artisan'}
+      </button>
+
+      {showForm && (
+        <form onSubmit={handleCreate} className="card" style={{ marginBottom: '24px', maxWidth: '500px' }}>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Name</label>
+            <input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Trade (e.g. Electrician, Plumber)</label>
+            <input className="input" value={form.trade} onChange={(e) => setForm({ ...form, trade: e.target.value })} required />
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>
+              Services offered (comma-separated)
+            </label>
+            <input
+              className="input"
+              placeholder="Wiring, socket repair, generator installation"
+              value={form.services_offered}
+              onChange={(e) => setForm({ ...form, services_offered: e.target.value })}
+              required
+            />
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Phone (optional)</label>
+            <input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          </div>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Bio (optional)</label>
+            <textarea className="input" value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+          </div>
+          <button type="submit" className="btn btn-solid">Create artisan</button>
+        </form>
+      )}
+
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid var(--ink)' }}>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Name</th>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Trade</th>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Services offered</th>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Status</th>
+              <th style={{ padding: '10px' }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {artisans.map((a) => (
+              <tr key={a.id} style={{ borderBottom: '1px solid var(--line)' }}>
+                <td style={{ padding: '10px', fontWeight: 600 }}>{a.name}</td>
+                <td style={{ padding: '10px', fontSize: '13px' }}>{a.trade}</td>
+                <td style={{ padding: '10px', fontSize: '13px' }}>{(a.services_offered || []).join(', ')}</td>
+                <td style={{ padding: '10px' }}>
+                  <span style={{ color: a.active ? 'var(--green)' : 'var(--steel)', fontSize: '12px', fontWeight: 600 }}>
+                    {a.active ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td style={{ padding: '10px' }}>
+                  <button className="btn btn-sm" onClick={() => toggleActive(a)}>
+                    {a.active ? 'Deactivate' : 'Activate'}
                   </button>
                 </td>
               </tr>

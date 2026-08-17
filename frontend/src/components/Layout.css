@@ -77,6 +77,82 @@
   font-weight: 600;
 }
 
+/* Artisans nav dropdown */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.nav-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: white;
+  border: 1px solid #E4E6EE;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 16px;
+  min-width: 460px;
+  max-width: 90vw;
+  z-index: 60;
+}
+
+.nav-dropdown-empty {
+  padding: 12px 4px;
+  font-size: 13px;
+  color: #5C6478;
+}
+
+.nav-dropdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.nav-dropdown-table th {
+  text-align: left;
+  padding: 6px 10px;
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #E4E6EE;
+}
+
+.nav-dropdown-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #F4F5F9;
+  color: #0F1B4C;
+}
+
+.nav-dropdown-table td:last-child {
+  color: #5C6478;
+}
+
+.nav-dropdown-viewall {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #E4E6EE;
+  font-size: 13px;
+  font-weight: 600;
+  color: #F2A024;
+  text-decoration: none;
+}
+
+.nav-dropdown-viewall:hover {
+  color: #d98d18;
+}
+
 /* Cart */
 .cart-btn {
   position: relative;

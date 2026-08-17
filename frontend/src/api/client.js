@@ -43,6 +43,17 @@ export const api = {
     adminDelete: (id) =>
       apiFetch(`/admin/services/${id}`, { method: 'DELETE' }),
   },
+  artisans: {
+    list: (trade) =>
+      apiFetch(`/artisans${trade ? `?trade=${trade}` : ''}`),
+    adminList: () => apiFetch('/admin/artisans'),
+    adminCreate: (data) =>
+      apiFetch('/admin/artisans', { method: 'POST', body: JSON.stringify(data) }),
+    adminUpdate: (id, data) =>
+      apiFetch(`/admin/artisans/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    adminDelete: (id) =>
+      apiFetch(`/admin/artisans/${id}`, { method: 'DELETE' }),
+  },
   orders: {
     create: (items, notes, address, scheduled_for) =>
       apiFetch('/orders', {

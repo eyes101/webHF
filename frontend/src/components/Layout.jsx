@@ -1,8 +1,9 @@
 // components/Layout.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { api } from '../api/client';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import './Layout.css';
 
@@ -12,6 +13,28 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [artisansOpen, setArtisansOpen] = useState(false);
+  const [artisans, setArtisans] = useState([]);
+  const artisansRef = useRef(null);
+
+  // Fetch once, lazily, the first time the dropdown is opened rather than on
+  // every page load — this is nav-bar content, not critical-path data.
+  const handleArtisansToggle = () => {
+    if (!artisansOpen && artisans.length === 0) {
+      api.artisans.list().then((res) => setArtisans(res.artisans)).catch(() => {});
+    }
+    setArtisansOpen((v) => !v);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (artisansRef.current && !artisansRef.current.contains(e.target)) {
+        setArtisansOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -34,6 +57,44 @@ export default function Layout() {
               <Link to="/services" className={isActive('/services') ? 'nav-link active' : 'nav-link'}>Services</Link>
               <Link to="/services" className="nav-link">Logistics</Link>
               <Link to="/services" className="nav-link">Special Duties</Link>
+              <div className="nav-dropdown" ref={artisansRef}>
+                <button
+                  type="button"
+                  className={`nav-link nav-dropdown-trigger ${isActive('/artisans') ? 'active' : ''}`}
+                  onClick={handleArtisansToggle}
+                  aria-expanded={artisansOpen}
+                >
+                  Artisans
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: artisansOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </button>
+                {artisansOpen && (
+                  <div className="nav-dropdown-panel">
+                    {artisans.length === 0 ? (
+                      <div className="nav-dropdown-empty">No artisans listed yet.</div>
+                    ) : (
+                      <table className="nav-dropdown-table">
+                        <thead>
+                          <tr><th>Name</th><th>Trade</th><th>Services offered</th></tr>
+                        </thead>
+                        <tbody>
+                          {artisans.slice(0, 6).map((a) => (
+                            <tr key={a.id}>
+                              <td>{a.name}</td>
+                              <td>{a.trade}</td>
+                              <td>{(a.services_offered || []).join(', ')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                    <Link to="/artisans" className="nav-dropdown-viewall" onClick={() => setArtisansOpen(false)}>
+                      View all artisans →
+                    </Link>
+                  </div>
+                )}
+              </div>
               {(user?.role === 'staff' || user?.role === 'admin') && (
                 <Link to="/staff" className={isActive('/staff') ? 'nav-link active' : 'nav-link'}>Staff</Link>
               )}
@@ -85,6 +146,7 @@ export default function Layout() {
           <div className="mobile-menu">
             <Link to="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
             <Link to="/services" className="mobile-link" onClick={() => setMenuOpen(false)}>Services</Link>
+            <Link to="/artisans" className="mobile-link" onClick={() => setMenuOpen(false)}>Artisans</Link>
             <Link to="/cart" className="mobile-link" onClick={() => setMenuOpen(false)}>Cart {items.length > 0 && `(${items.length})`}</Link>
             {user ? (
               <>

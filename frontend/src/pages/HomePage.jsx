@@ -56,8 +56,8 @@ export default function HomePage() {
             </div>
 
             <h1 className="hero-title">
-              Seamless <span className="hero-title-accent">delivery</span> &amp;<br />
-              premium services.
+              House Care and<br />
+              <span className="hero-title-accent">Properties</span> Management.
             </h1>
 
             <p className="hero-desc">

@@ -7,7 +7,7 @@ Currency: NGN.
 
 - **`frontend/`** — React + Vite. Sign-in via Firebase Auth (Google, Facebook, email/password).
 - **`functions/`** — Cloud Functions (Express app). All `/api/*` routes. Uses `firebase-admin` to verify ID tokens and talk to Firestore.
-- **Firestore** — `users`, `services`, `orders` (with embedded `items`), `payments`, and `orders/{id}/messages` subcollections.
+- **Firestore** — `users`, `services`, `artisans`, `orders` (with embedded `items`), `payments`, and `orders/{id}/messages` subcollections.
 - **`firebase.json` / `firestore.rules` / `firestore.indexes.json`** — project config. Firestore rules deny all direct client access — only the Cloud Function (Admin SDK) touches the database, so the frontend never talks to Firestore directly.
 
 This replaces an earlier version that ran a custom Node/SQLite backend on Railway with a Vercel-hosted frontend. That setup is retired — everything now runs on Firebase (Hosting + Functions + Firestore + Auth) as a single deployable unit.
@@ -23,6 +23,7 @@ This replaces an earlier version that ran a custom Node/SQLite backend on Railwa
    - `PAYSTACK_SECRET_KEY` — required if using `paystack`
    - `FRONTEND_URL` — used to build Paystack's post-payment redirect
    - `CORS_ORIGIN` — comma-separated allowed origins (defaults to `https://www.halfcon.site,https://halfcon.site`)
+6. **Seed sample data** (services + artisans + the admin-role placeholder): the live Firestore starts empty — run `node scripts/seed-firestore.mjs` after your first deploy and after authenticating (`gcloud auth application-default login`). Safe to re-run; it skips anything already there by name.
 
 ## Deploy
 
@@ -48,6 +49,8 @@ cd functions && npm install                  # then use the Firebase emulator su
 | GET | `/api/services` | none | Public catalog (optional `?category=`) |
 | GET | `/api/services/:slug` | none | Single service |
 | GET/POST/PUT/DELETE | `/api/admin/services...` | staff/admin | Catalog management |
+| GET | `/api/artisans` | none | Public artisan list (optional `?trade=`) |
+| GET/POST/PUT/DELETE | `/api/admin/artisans...` | staff/admin | Artisan management |
 | POST | `/api/orders` | required | Create an order from cart items |
 | GET | `/api/orders` | required | List orders (own, or all if staff). Supports `?page=`, `?limit=`, `?status=` |
 | GET | `/api/orders/:id` | required | Get one order |
