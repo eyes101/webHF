@@ -1,11 +1,9 @@
 // api/client.js
 //
-// Every request now carries a Firebase ID token in the Authorization header
-// instead of a session cookie — Cloud Functions verifies it per-request (see
-// functions/src/middleware/requireAuth.js). Firebase tokens expire hourly,
-// so we always fetch a fresh one via getIdToken() right before each call —
-// the Firebase SDK caches/refreshes under the hood, so this is cheap and
-// avoids ever sending a stale token.
+// Every request carries a Firebase ID token in the Authorization header.
+// Cloud Functions verifies it per-request (see functions/src/middleware/requireAuth.js).
+// Firebase tokens expire hourly, so we always fetch a fresh one via getIdToken()
+// right before each call.
 import { auth } from '../config/firebase';
 
 const API_BASE = import.meta.env.VITE_API_URL
@@ -17,13 +15,22 @@ async function apiFetch(endpoint, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
 
   if (auth.currentUser) {
-    const idToken = await auth.currentUser.getIdToken();
-    headers.Authorization = `Bearer ${idToken}`;
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      headers.Authorization = `Bearer ${idToken}`;
+    } catch (e) {
+      console.warn('Failed to retrieve Firebase ID token:', e);
+    }
   }
 
   const res = await fetch(url, { ...options, headers });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `API error: ${res.status}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.error || `API error: ${res.status}`);
+    err.status = res.status;
+    err.code = data.code;
+    throw err;
+  }
   return data;
 }
 
@@ -33,7 +40,7 @@ export const api = {
   },
   services: {
     list: (category) =>
-      apiFetch(`/services${category ? `?category=${category}` : ''}`),
+      apiFetch(`/services${category ? `?category=${encodeURIComponent(category)}` : ''}`),
     get: (slug) => apiFetch(`/services/${slug}`),
     adminList: () => apiFetch('/admin/services'),
     adminCreate: (data) =>
@@ -45,7 +52,7 @@ export const api = {
   },
   artisans: {
     list: (trade) =>
-      apiFetch(`/artisans${trade ? `?trade=${trade}` : ''}`),
+      apiFetch(`/artisans${trade ? `?trade=${encodeURIComponent(trade)}` : ''}`),
     adminList: () => apiFetch('/admin/artisans'),
     adminCreate: (data) =>
       apiFetch('/admin/artisans', { method: 'POST', body: JSON.stringify(data) }),

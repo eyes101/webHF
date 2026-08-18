@@ -1,10 +1,4 @@
-// index.js — Halfcon backend, now a single Cloud Function running Express.
-//
-// Note on webhook raw body: Cloud Functions' HTTP trigger automatically
-// captures the raw request body as `req.rawBody` before Express's JSON
-// parser touches it — that's exactly what the Paystack webhook's HMAC
-// signature check needs, no extra middleware required (unlike a plain
-// Express app, where you'd have to set that up yourself).
+// index.js — Halfcon backend, single Cloud Function running Express.
 import { onRequest } from 'firebase-functions/v2/https';
 import express from 'express';
 import cors from 'cors';
@@ -18,11 +12,37 @@ import { registerMessageRoutes } from './src/routes/messages.js';
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || 'https://www.halfcon.site,https://halfcon.site')
+const configuredOrigins = (process.env.CORS_ORIGIN || 'https://www.halfcon.site,https://halfcon.site')
   .split(',')
-  .map((s) => s.trim());
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server or same-origin)
+      if (!origin) return callback(null, true);
+
+      // Check configured exact origins
+      if (configuredOrigins.includes(origin)) return callback(null, true);
+
+      // Check localhost / 127.0.0.1 for local development
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Check Firebase Hosting domains (*.web.app, *.firebaseapp.com) and Halfcon domains (*.halfcon.site)
+      if (/^https:\/\/([a-z0-9-]+\.)?(web\.app|firebaseapp\.com|halfcon\.site)$/i.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Default fallback
+      callback(null, false);
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {

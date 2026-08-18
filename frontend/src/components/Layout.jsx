@@ -8,20 +8,19 @@ import { CONTACTS, whatsappLink } from '../config/contacts';
 import './Layout.css';
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, isEmailVerified, logout, resendVerificationEmail } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [artisansOpen, setArtisansOpen] = useState(false);
   const [artisans, setArtisans] = useState([]);
+  const [resendStatus, setResendStatus] = useState('');
   const artisansRef = useRef(null);
 
-  // Fetch once, lazily, the first time the dropdown is opened rather than on
-  // every page load — this is nav-bar content, not critical-path data.
   const handleArtisansToggle = () => {
     if (!artisansOpen && artisans.length === 0) {
-      api.artisans.list().then((res) => setArtisans(res.artisans)).catch(() => {});
+      api.artisans.list().then((res) => setArtisans(res.artisans || [])).catch(() => {});
     }
     setArtisansOpen((v) => !v);
   };
@@ -41,22 +40,78 @@ export default function Layout() {
     navigate('/');
   };
 
-  const isActive = (path) => location.pathname === path;
+  const handleResend = async () => {
+    setResendStatus('Sending...');
+    try {
+      await resendVerificationEmail();
+      setResendStatus('Verification link sent! Check your email inbox & spam folder.');
+    } catch (e) {
+      setResendStatus('Failed to send verification link. Please try again.');
+    }
+  };
+
+  const isActive = (path) => {
+    if (path === '/') return location.pathname === '/' && !location.search;
+    return location.pathname + location.search === path;
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Top Banner for Unverified Email */}
+      {user && !isEmailVerified && (
+        <div
+          style={{
+            background: 'var(--rust-dim)',
+            borderBottom: '1px solid #FDE68A',
+            color: '#92400E',
+            padding: '8px 16px',
+            fontSize: '13px',
+            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <span>
+            Your email address (<strong>{user.email}</strong>) is unverified.
+          </span>
+          <button
+            type="button"
+            onClick={handleResend}
+            style={{
+              background: 'var(--ink)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '2px 8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Resend Verification Link
+          </button>
+          {resendStatus && <span style={{ fontWeight: 600, color: 'var(--green)' }}>{resendStatus}</span>}
+        </div>
+      )}
+
       <header className="header">
         <div className="header-inner">
           <div className="header-left">
             <Link to="/" className="logo-link">
-              <img src="/logo.png" alt="Halfcon" className="logo-img" />
+              <img src="/logo.png" alt="Halfcon" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
+              <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '24px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--ink)' }}>
+                HALFCON
+              </span>
             </Link>
 
             <nav className="nav">
               <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>Home</Link>
-              <Link to="/services" className={isActive('/services') ? 'nav-link active' : 'nav-link'}>Services</Link>
-              <Link to="/services" className="nav-link">Logistics</Link>
-              <Link to="/services" className="nav-link">Special Duties</Link>
+              <Link to="/services" className={location.pathname === '/services' && !location.search ? 'nav-link active' : 'nav-link'}>All Services</Link>
+              <Link to="/services?category=Logistics" className={location.search.includes('Logistics') ? 'nav-link active' : 'nav-link'}>Logistics</Link>
+              <Link to="/services?category=Special%20Duties" className={location.search.includes('Special') ? 'nav-link active' : 'nav-link'}>Special Duties</Link>
               <div className="nav-dropdown" ref={artisansRef}>
                 <button
                   type="button"
@@ -96,7 +151,9 @@ export default function Layout() {
                 )}
               </div>
               {(user?.role === 'staff' || user?.role === 'admin') && (
-                <Link to="/staff" className={isActive('/staff') ? 'nav-link active' : 'nav-link'}>Staff</Link>
+                <Link to="/staff" className={isActive('/staff') ? 'nav-link active' : 'nav-link'}>
+                  Staff Portal
+                </Link>
               )}
             </nav>
           </div>
@@ -113,8 +170,15 @@ export default function Layout() {
             <div className="auth-divider" />
 
             {user ? (
-              <div className="user-menu">
-                <span className="user-name">{user.name}</span>
+              <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="user-name" style={{ fontWeight: 600 }}>
+                  {user.name}
+                  {(user.role === 'admin' || user.role === 'staff') && (
+                    <span style={{ marginLeft: '6px', fontSize: '10px', textTransform: 'uppercase', background: 'var(--ink)', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
+                      {user.role}
+                    </span>
+                  )}
+                </span>
                 {user.role === 'customer' && (
                   <Link to="/orders" className="btn-ghost">Orders</Link>
                 )}
@@ -145,12 +209,15 @@ export default function Layout() {
         {menuOpen && (
           <div className="mobile-menu">
             <Link to="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
-            <Link to="/services" className="mobile-link" onClick={() => setMenuOpen(false)}>Services</Link>
+            <Link to="/services" className="mobile-link" onClick={() => setMenuOpen(false)}>All Services</Link>
+            <Link to="/services?category=Logistics" className="mobile-link" onClick={() => setMenuOpen(false)}>Logistics</Link>
+            <Link to="/services?category=Special%20Duties" className="mobile-link" onClick={() => setMenuOpen(false)}>Special Duties</Link>
             <Link to="/artisans" className="mobile-link" onClick={() => setMenuOpen(false)}>Artisans</Link>
             <Link to="/cart" className="mobile-link" onClick={() => setMenuOpen(false)}>Cart {items.length > 0 && `(${items.length})`}</Link>
             {user ? (
               <>
                 {user.role === 'customer' && <Link to="/orders" className="mobile-link" onClick={() => setMenuOpen(false)}>Orders</Link>}
+                {(user.role === 'staff' || user.role === 'admin') && <Link to="/staff" className="mobile-link" onClick={() => setMenuOpen(false)}>Staff Dashboard</Link>}
                 <Link to="/settings" className="mobile-link" onClick={() => setMenuOpen(false)}>Settings</Link>
                 <button className="mobile-link mobile-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>Logout</button>
               </>
@@ -172,7 +239,9 @@ export default function Layout() {
         <div className="footer-inner">
           <div className="footer-col">
             <Link to="/" className="footer-logo-link">
-              <img src="/logo.png" alt="Halfcon" className="footer-logo-img" />
+              <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '24px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#fff' }}>
+                HALFCON
+              </span>
             </Link>
             <p className="footer-blurb">
               Nigeria's premier logistics, special duties, and property development company. Delivering excellence across the nation.
@@ -189,20 +258,19 @@ export default function Layout() {
 
           <div className="footer-col">
             <div className="footer-heading">Services</div>
-            <Link to="/services" className="footer-link">Express Logistics</Link>
-            <Link to="/services" className="footer-link">Special Duties</Link>
-            <Link to="/services" className="footer-link">Property Development</Link>
+            <Link to="/services?category=Logistics" className="footer-link">Express Logistics</Link>
+            <Link to="/services?category=Special%20Duties" className="footer-link">Special Duties</Link>
+            <Link to="/services?category=Property" className="footer-link">Property Development</Link>
             <Link to="/services" className="footer-link">Corporate Fulfillment</Link>
-            <Link to="/services" className="footer-link">Haulage</Link>
+            <Link to="/artisans" className="footer-link">Verified Artisans</Link>
           </div>
 
           <div className="footer-col">
             <div className="footer-heading">Company</div>
-            <a href="#" className="footer-link">About Us</a>
-            <a href="#" className="footer-link">Careers</a>
-            <a href="#" className="footer-link">News &amp; Blog</a>
-            <a href="#" className="footer-link">Privacy Policy</a>
-            <a href="#" className="footer-link">Terms of Service</a>
+            <Link to="/" className="footer-link">Home</Link>
+            <Link to="/services" className="footer-link">Catalog</Link>
+            <Link to="/artisans" className="footer-link">Find Artisans</Link>
+            <a href={`mailto:${CONTACTS.email}`} className="footer-link">Contact Support</a>
           </div>
 
           <div className="footer-col">
@@ -223,11 +291,11 @@ export default function Layout() {
         </div>
 
         <div className="footer-bottom">
-          <div>© 2026 Halfcon — All rights reserved.</div>
+          <div>© 2026 Halfcon — Operations, Built to Move. All rights reserved.</div>
           <div>
-            <a href="#" className="footer-bottom-link">Privacy</a>
+            <Link to="/services" className="footer-bottom-link">Services</Link>
             <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
-            <a href="#" className="footer-bottom-link">Terms</a>
+            <Link to="/artisans" className="footer-bottom-link">Artisans</Link>
           </div>
         </div>
       </footer>
