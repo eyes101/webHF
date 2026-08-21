@@ -12,14 +12,20 @@ export default function StaffDashboard() {
       <h1 style={{ marginBottom: '10px', fontFamily: "'Big Shoulders Display', sans-serif", textTransform: 'uppercase', fontSize: '36px' }}>
         Staff dashboard
       </h1>
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '30px', borderBottom: '2px solid var(--ink)', paddingBottom: '12px' }}>
-        {['orders', 'services', 'artisans', 'payments', 'customers'].map((t) => (
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '30px', borderBottom: '2px solid var(--ink)', paddingBottom: '12px', flexWrap: 'wrap' }}>
+        {[
+          { id: 'orders', label: 'Orders & Dispatches' },
+          { id: 'services', label: 'Services Catalog' },
+          { id: 'artisans', label: 'Artisan Directory' },
+          { id: 'payments', label: 'Transactions' },
+          { id: 'users', label: 'Staff & User Access' },
+        ].map((t) => (
           <button
-            key={t}
-            className={`btn ${tab === t ? 'btn-solid' : ''}`}
-            onClick={() => setTab(t)}
+            key={t.id}
+            className={`btn ${tab === t.id ? 'btn-solid' : ''}`}
+            onClick={() => setTab(t.id)}
           >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+            {t.label}
           </button>
         ))}
       </div>
@@ -27,7 +33,7 @@ export default function StaffDashboard() {
       {tab === 'services' && <ServicesTab />}
       {tab === 'artisans' && <ArtisansTab />}
       {tab === 'payments' && <PaymentsTab />}
-      {tab === 'customers' && <CustomersTab />}
+      {tab === 'users' && <UsersTab />}
     </div>
   );
 }
@@ -431,36 +437,185 @@ function PaymentsTab() {
   );
 }
 
-function CustomersTab() {
+function UsersTab() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [roleFilter, setRoleFilter] = useState('');
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteName, setInviteName] = useState('');
+  const [inviteRole, setInviteRole] = useState('staff');
+  const [statusMsg, setStatusMsg] = useState('');
 
-  useEffect(() => {
-    api.admin.users().then((res) => setUsers(res.users)).finally(() => setLoading(false));
-  }, []);
+  const load = () => {
+    setLoading(true);
+    api.admin.users()
+      .then((res) => setUsers(res.users || []))
+      .catch((err) => console.error('Failed to load users:', err))
+      .finally(() => setLoading(false));
+  };
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(load, []);
+
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await api.admin.updateUserRole(userId, newRole);
+      setStatusMsg(`User role updated to ${newRole}.`);
+      setTimeout(() => setStatusMsg(''), 3000);
+      load();
+    } catch (err) {
+      alert('Failed to update role: ' + err.message);
+    }
+  };
+
+  const handleInviteStaff = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.admin.inviteStaff({ email: inviteEmail, name: inviteName, role: inviteRole });
+      setStatusMsg(res.message || 'Staff member authorized!');
+      setInviteEmail('');
+      setInviteName('');
+      setShowInviteForm(false);
+      setTimeout(() => setStatusMsg(''), 4000);
+      load();
+    } catch (err) {
+      alert('Error inviting staff: ' + err.message);
+    }
+  };
+
+  const filteredUsers = users.filter((u) => {
+    if (!roleFilter) return true;
+    return (u.role || 'customer').toLowerCase() === roleFilter.toLowerCase();
+  });
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-      <thead>
-        <tr style={{ borderBottom: '2px solid var(--ink)' }}>
-          <th style={{ textAlign: 'left', padding: '10px' }}>Name</th>
-          <th style={{ textAlign: 'left', padding: '10px' }}>Email</th>
-          <th style={{ textAlign: 'left', padding: '10px' }}>Phone</th>
-          <th style={{ textAlign: 'left', padding: '10px' }}>Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((u) => (
-          <tr key={u.id} style={{ borderBottom: '1px solid var(--line)' }}>
-            <td style={{ padding: '10px', fontWeight: 600 }}>{u.name}</td>
-            <td style={{ padding: '10px', fontSize: '13px' }}>{u.email}</td>
-            <td style={{ padding: '10px', fontSize: '13px' }}>{u.phone || '—'}</td>
-            <td style={{ padding: '10px', fontSize: '12px', textTransform: 'uppercase' }}>{u.role}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className={`btn btn-sm ${!roleFilter ? 'btn-solid' : ''}`} onClick={() => setRoleFilter('')}>
+            All Users ({users.length})
+          </button>
+          <button className={`btn btn-sm ${roleFilter === 'staff' ? 'btn-solid' : ''}`} onClick={() => setRoleFilter('staff')}>
+            Staff ({users.filter((u) => u.role === 'staff').length})
+          </button>
+          <button className={`btn btn-sm ${roleFilter === 'admin' ? 'btn-solid' : ''}`} onClick={() => setRoleFilter('admin')}>
+            Admins ({users.filter((u) => u.role === 'admin').length})
+          </button>
+          <button className={`btn btn-sm ${roleFilter === 'customer' ? 'btn-solid' : ''}`} onClick={() => setRoleFilter('customer')}>
+            Customers ({users.filter((u) => !u.role || u.role === 'customer').length})
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-solid"
+          onClick={() => setShowInviteForm(!showInviteForm)}
+        >
+          {showInviteForm ? 'Cancel' : '+ Authorize New Staff Email'}
+        </button>
+      </div>
+
+      {statusMsg && (
+        <div className="success" style={{ marginBottom: '16px' }}>
+          ✓ {statusMsg}
+        </div>
+      )}
+
+      {showInviteForm && (
+        <form onSubmit={handleInviteStaff} className="card" style={{ marginBottom: '24px', background: 'var(--paper-dim)' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '12px', color: 'var(--ink)' }}>
+            Authorize New Staff Account
+          </h3>
+          <p style={{ fontSize: '13px', color: 'var(--steel)', marginBottom: '16px' }}>
+            Pre-authorize an employee's email. When they register on the site or log in with Google, they will automatically be granted staff dashboard permissions.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 0.8fr auto', gap: '12px', alignItems: 'end' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Employee Email *</label>
+              <input
+                type="email"
+                className="input"
+                required
+                placeholder="staff@halfcon.site"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Staff Name</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="e.g. Operations Supervisor"
+                value={inviteName}
+                onChange={(e) => setInviteName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Role</label>
+              <select
+                className="input"
+                value={inviteRole}
+                onChange={(e) => setInviteRole(e.target.value)}
+              >
+                <option value="staff">Staff Member</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <button type="submit" className="btn btn-solid">
+              Authorize Account
+            </button>
+          </div>
+        </form>
+      )}
+
+      {loading ? (
+        <div>Loading users...</div>
+      ) : filteredUsers.length === 0 ? (
+        <div style={{ color: 'var(--steel)' }}>No users found.</div>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid var(--ink)' }}>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Name</th>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Email</th>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Phone</th>
+              <th style={{ textAlign: 'left', padding: '10px' }}>Access Role</th>
+              <th style={{ textAlign: 'right', padding: '10px' }}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.map((u) => (
+              <tr key={u.id} style={{ borderBottom: '1px solid var(--line)' }}>
+                <td style={{ padding: '10px', fontWeight: 600 }}>{u.name}</td>
+                <td style={{ padding: '10px', fontSize: '13px' }}>{u.email}</td>
+                <td style={{ padding: '10px', fontSize: '13px' }}>{u.phone || '—'}</td>
+                <td style={{ padding: '10px' }}>
+                  <span
+                    className={`badge ${u.role === 'admin' ? 'badge-amber' : u.role === 'staff' ? 'badge-blue' : 'badge-gray'}`}
+                    style={{ textTransform: 'uppercase', fontSize: '11px' }}
+                  >
+                    {u.role || 'customer'}
+                  </span>
+                </td>
+                <td style={{ padding: '10px', textAlign: 'right' }}>
+                  <select
+                    value={u.role || 'customer'}
+                    onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                    className="input"
+                    style={{ width: 'auto', padding: '4px 8px', fontSize: '12px' }}
+                  >
+                    <option value="customer">Customer</option>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }

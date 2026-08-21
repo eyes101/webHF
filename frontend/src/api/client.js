@@ -95,6 +95,16 @@ export const api = {
   },
   admin: {
     users: () => apiFetch('/admin/users'),
+    updateUserRole: (userId, role) =>
+      apiFetch(`/admin/users/${userId}/role`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role }),
+      }),
+    inviteStaff: (data) =>
+      apiFetch('/admin/users/invite', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     payments: () => apiFetch('/admin/payments'),
   },
 };
