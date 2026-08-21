@@ -1,43 +1,51 @@
 // scripts/seed-firestore.mjs
 //
-// One-time (or re-runnable — it skips existing entries by name) seed script
-// for services and artisans. Run this AFTER `firebase deploy` and AFTER
-// you've authenticated locally, since it uses Application Default
-// Credentials to talk to your live Firestore:
-//
-//   npm install firebase-admin   (in this scripts/ folder, or reuse functions/node_modules)
-//   gcloud auth application-default login   (if you haven't already)
-//   node scripts/seed-firestore.mjs
-//
-// Safe to re-run — it checks for an existing doc with the same name/slug
-// before inserting, so it won't create duplicates.
+// Seed script for Halfcon services and verified artisans.
 import admin from 'firebase-admin';
 
-admin.initializeApp({ projectId: 'tigertrigger-c1e0a' });
+if (admin.apps.length === 0) {
+  admin.initializeApp({ projectId: 'tigertrigger-c1e0a' });
+}
 const db = admin.firestore();
 
 const services = [
-  { category: 'Home Development', name: 'Home Interior Fit-Out', description: 'Full interior development — flooring, fixtures, finishing — per project scope.', price_cents: 250000000, unit: 'flat' },
-  { category: 'Home Development', name: 'Landscaping & Exterior Development', description: 'Garden design, paving, exterior finishing for residential properties.', price_cents: 90000000, unit: 'flat' },
-  { category: 'Home Development', name: 'Residential Renovation Consultation', description: 'On-site assessment and renovation planning for homeowners.', price_cents: 7500000, unit: 'flat' },
-  { category: 'Innovation and Relocation', name: 'Business Relocation Planning', description: 'End-to-end planning for relocating office or business operations.', price_cents: 60000000, unit: 'flat' },
-  { category: 'Innovation and Relocation', name: 'Process Innovation Consultation', description: 'Workflow and operations review for growing businesses.', price_cents: 30000000, unit: 'flat' },
-  { category: 'Logistics Service', name: 'Inter-State Logistics Coordination', description: 'Coordinated freight movement between states.', price_cents: 6000000, unit: 'flat' },
-  { category: 'Logistics Service', name: 'Local Freight & Delivery', description: 'Same-city freight and delivery service.', price_cents: 150000, unit: 'per_km' },
-  { category: 'Logistics Service', name: 'Warehousing & Storage', description: 'Secure short and long-term storage space.', price_cents: 100000, unit: 'per_sqm' },
-  { category: 'Office Development', name: 'Office Renovation Consultation', description: 'On-site assessment and renovation planning for office spaces.', price_cents: 10000000, unit: 'flat' },
-  { category: 'Office Development', name: 'Office Space Fit-Out', description: 'Full office interior build-out — partitions, wiring, furnishing.', price_cents: 400000000, unit: 'flat' },
-  { category: 'Special Duties', name: 'Event Security & Support Duty', description: 'Vetted personnel for event security and logistics support.', price_cents: 2000000, unit: 'hourly' },
-  { category: 'Special Duties', name: 'General Special Duty Assignment', description: 'Custom-scoped special duty personnel for one-off assignments.', price_cents: 1500000, unit: 'hourly' },
+  // 1. Electrical & Power Systems
+  { category: 'Electrical & Power', name: 'Complete Home Electrical Rewiring', description: 'Certified full-structure cable inspection, load balancing, and rewiring with premium safety conduits.', price_cents: 18000000, unit: 'per project' },
+  { category: 'Electrical & Power', name: 'Solar Inverter & Battery Installation', description: 'End-to-end solar panels, hybrid inverter, and lithium battery bank sizing, mounting, and calibration.', price_cents: 35000000, unit: 'per setup' },
+  { category: 'Electrical & Power', name: 'Generator Automated Changeover Setup', description: 'ATS (Automatic Transfer Switch) installation and generator power integration for zero-downtime switching.', price_cents: 6500000, unit: 'per unit' },
+  { category: 'Electrical & Power', name: 'Smart Home Lighting & Socket Fit-Out', description: 'Installation of automated dimmers, smart switches, safety breakers, and USB sockets.', price_cents: 4500000, unit: 'flat' },
+
+  // 2. Plumbing & Water Infrastructure
+  { category: 'Plumbing & Water', name: 'Comprehensive Leak Detection & Piping', description: 'Non-invasive acoustic and thermal pipe leak diagnosis, pressure testing, and emergency pipe repair.', price_cents: 5500000, unit: 'flat' },
+  { category: 'Plumbing & Water', name: 'Borehole, Pump & Water Filtration Setup', description: 'Submersible pump installation, water treatment filtration system, and overhead tank plumbing.', price_cents: 28000000, unit: 'per project' },
+  { category: 'Plumbing & Water', name: 'Bathroom Sanitary Ware & Heater Fitting', description: 'Expert installation of water heaters, shower systems, modern vanities, faucets, and WC suites.', price_cents: 8500000, unit: 'per bathroom' },
+  { category: 'Plumbing & Water', name: 'Drainage & Sewage Line Maintenance', description: 'High-pressure drain jetting, soakaway clearing, and odor-trap servicing.', price_cents: 7000000, unit: 'flat' },
+
+  // 3. Carpentry & Interior Fit-Out
+  { category: 'Carpentry & Interiors', name: 'Custom Kitchen Cabinetry & Wardrobes', description: 'Bespoke moisture-resistant MDF/HDF modular cabinetry, soft-close hinges, and granite countertops.', price_cents: 45000000, unit: 'per project' },
+  { category: 'Carpentry & Interiors', name: 'POP False Ceiling & Drywall Partitions', description: 'Designer plaster of Paris (POP) ceiling design with cove lighting slots and gypsum acoustic walls.', price_cents: 22000000, unit: 'per room' },
+  { category: 'Carpentry & Interiors', name: 'Door Joinery & Security Lock Fitting', description: 'Hardwood security doors, reinforced frames, digital smart door locks, and architectural hardware.', price_cents: 9500000, unit: 'flat' },
+  { category: 'Carpentry & Interiors', name: 'Floor Tiling & Wooden Decking', description: 'Precision porcelain, marble, or interlocking tile laying and outdoor treated wooden deck styling.', price_cents: 15000000, unit: 'per area' },
+
+  // 4. Property Management & Structural Care
+  { category: 'Property Management', name: 'Complete Exterior & Interior Painting', description: 'Surface preparation, moisture-seal primer, crack filling, and premium weather-shield emulsion coats.', price_cents: 32000000, unit: 'per building' },
+  { category: 'Property Management', name: 'Roof Waterproofing & Storm Leak Repair', description: 'Bituminous membrane waterproofing, gutter realignment, and roof sheet leak sealing.', price_cents: 16000000, unit: 'per roof' },
+  { category: 'Property Management', name: 'Facility Inspection & Preventive Audit', description: 'Comprehensive structural, electrical, and plumbing safety audit with detailed remediation reports.', price_cents: 12000000, unit: 'per audit' },
+  { category: 'Property Management', name: 'Masonry, Plastering & Perimeter Fencing', description: 'Blockwork construction, damp-proof screeding, perimeter wall reinforcement, and razor wire.', price_cents: 25000000, unit: 'per project' },
+
+  // 5. Logistics & Special Duties
+  { category: 'Logistics Service', name: 'Inter-State Logistics Coordination', description: 'Coordinated freight movement and scheduled haulage between major Nigerian state capitals.', price_cents: 6000000, unit: 'flat' },
+  { category: 'Logistics Service', name: 'Local Freight & Express Dispatch', description: 'Same-day city express dispatch and cargo transportation.', price_cents: 150000, unit: 'per km' },
+  { category: 'Special Duties', name: 'Special Operations Duty Assignment', description: 'Vetted personnel and field logistics deployment for high-priority operational tasks.', price_cents: 2000000, unit: 'hourly' },
 ];
 
 const artisans = [
-  { name: 'Emeka Obi', trade: 'Electrician', services_offered: ['Wiring', 'Socket repair', 'Generator installation', 'Inverter setup'], phone: '+234 803 000 0001' },
-  { name: 'Bisi Adewale', trade: 'Plumber', services_offered: ['Pipe repair', 'Bathroom fitting', 'Water heater installation'], phone: '+234 803 000 0002' },
-  { name: 'Tunde Bakare', trade: 'Carpenter', services_offered: ['Custom furniture', 'Door & window frames', 'Cabinet installation'], phone: '+234 803 000 0003' },
-  { name: 'Grace Nnamdi', trade: 'Painter', services_offered: ['Interior painting', 'Exterior painting', 'Wall texturing'], phone: '+234 803 000 0004' },
-  { name: 'Ibrahim Musa', trade: 'Mason', services_offered: ['Blockwork', 'Tiling', 'Plastering', 'POP ceiling'], phone: '+234 803 000 0005' },
-  { name: 'Chika Eze', trade: 'AC Technician', services_offered: ['AC installation', 'AC servicing', 'Refrigeration repair'], phone: '+234 803 000 0006' },
+  { name: 'Emeka Obi', trade: 'Electrician', services_offered: ['Complete Rewiring', 'Solar Inverter Setup', 'Generator Automation', 'Circuit Diagnostics'], phone: '+234 803 000 0001' },
+  { name: 'Bisi Adewale', trade: 'Plumber', services_offered: ['Leak Detection', 'Water Heater Setup', 'Water Treatment', 'Bathroom Fitting'], phone: '+234 803 000 0002' },
+  { name: 'Tunde Bakare', trade: 'Carpenter', services_offered: ['Kitchen Cabinets', 'Wardrobes', 'POP Ceilings', 'Security Door Fitting'], phone: '+234 803 000 0003' },
+  { name: 'Grace Nnamdi', trade: 'Painter & Decorator', services_offered: ['Interior Emulsion', 'Weather-Shield Exterior', 'Wall Screeding', 'Waterproofing'], phone: '+234 803 000 0004' },
+  { name: 'Ibrahim Musa', trade: 'Mason & Builder', services_offered: ['Blockwork', 'Tiling & Marble', 'POP Ceilings', 'Plastering'], phone: '+234 803 000 0005' },
+  { name: 'Chika Eze', trade: 'HVAC Technician', services_offered: ['AC Installation', 'Inverter AC Servicing', 'Duct Maintenance'], phone: '+234 803 000 0006' },
 ];
 
 function slugify(text) {
@@ -79,7 +87,7 @@ async function seedAdmin() {
     return;
   }
   await col.add({ name: 'Halfcon Admin', email, role: 'admin', created_at: admin.firestore.FieldValue.serverTimestamp() });
-  console.log(`Reserved admin role for ${email} — create a Firebase Auth user with this exact email to activate it.`);
+  console.log(`Reserved admin role for ${email}.`);
 }
 
 await seedServices();
