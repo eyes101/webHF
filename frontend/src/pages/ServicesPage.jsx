@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
+import ArtisanHireNegotiationModal from '../components/ArtisanHireNegotiationModal';
 
 const PROPERTY_PILLARS = [
   {
@@ -74,6 +75,7 @@ export default function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || '';
   const [loading, setLoading] = useState(true);
+  const [negotiatePillar, setNegotiatePillar] = useState(null);
   const { addItem } = useCart();
   const [addedItem, setAddedItem] = useState(null);
 
@@ -154,14 +156,16 @@ export default function ServicesPage() {
         </p>
       </div>
 
-      {/* 4-COLUMN HOME MAINTENANCE & PROPERTY PILLARS */}
+      {/* 4-COLUMN HOME MAINTENANCE & PROPERTY PILLARS WITH P2P ARTISAN HIRING */}
       <section style={{ marginBottom: '56px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '26px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ink)' }}>
               Home Maintenance &amp; Property Pillars
             </h2>
-            <div style={{ fontSize: '13px', color: 'var(--steel)' }}>Click any pillar to filter tailored services below</div>
+            <div style={{ fontSize: '13px', color: 'var(--steel)' }}>
+              Click any pillar to filter services, or click <strong>Hire Artisan</strong> to negotiate custom task scopes with escrow protection.
+            </div>
           </div>
           {activeCategory && (
             <button
@@ -174,7 +178,7 @@ export default function ServicesPage() {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
           {PROPERTY_PILLARS.map((pillar) => {
             const isSelected = activeCategory.toLowerCase().includes(pillar.id) || activeCategory.toLowerCase().includes(pillar.category.toLowerCase());
             return (
@@ -185,14 +189,12 @@ export default function ServicesPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  cursor: 'pointer',
                   borderColor: isSelected ? pillar.color : 'var(--line)',
                   background: isSelected ? pillar.bg : '#ffffff',
                   boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)',
                   transition: 'all 0.2s ease',
                   padding: '24px 20px',
                 }}
-                onClick={() => handleCategorySelect(pillar.category)}
               >
                 <div>
                   <div
@@ -230,20 +232,27 @@ export default function ServicesPage() {
                   </ul>
                 </div>
 
-                <div
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    color: pillar.color,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    borderTop: '1px solid var(--line)',
-                    paddingTop: '12px',
-                  }}
-                >
-                  <span>{isSelected ? 'Viewing Services' : 'Browse Services'}</span>
-                  <span>→</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--line)', paddingTop: '16px' }}>
+                  {/* Filter View Button */}
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    style={{ fontSize: '12px', justifyContent: 'space-between', width: '100%', color: pillar.color, fontWeight: 700 }}
+                    onClick={() => handleCategorySelect(pillar.category)}
+                  >
+                    <span>{isSelected ? '✓ Filtering Services' : 'Browse Catalog Items'}</span>
+                    <span>→</span>
+                  </button>
+
+                  {/* P2P Artisan Hiring & Negotiation Trigger */}
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-solid"
+                    style={{ fontSize: '12px', width: '100%', background: '#0F1B4C', borderColor: '#0F1B4C' }}
+                    onClick={() => setNegotiatePillar(pillar.id)}
+                  >
+                    🤝 Hire Artisan &amp; Escrow Task
+                  </button>
                 </div>
               </div>
             );
@@ -378,6 +387,14 @@ export default function ServicesPage() {
             </Link>
           ))}
         </div>
+      )}
+
+      {/* P2P Artisan Hiring & Negotiation Modal */}
+      {negotiatePillar && (
+        <ArtisanHireNegotiationModal
+          pillarId={negotiatePillar}
+          onClose={() => setNegotiatePillar(null)}
+        />
       )}
     </div>
   );
