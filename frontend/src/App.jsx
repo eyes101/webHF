@@ -15,6 +15,7 @@ import OrderDetailPage from './pages/OrderDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StaffDashboard from './pages/StaffDashboard';
+import StaffLoginPage from './pages/StaffLoginPage';
 import SettingsPage from './pages/SettingsPage';
 import './globals.css';
 
@@ -32,11 +33,14 @@ function ProtectedRoute({ children, staffOnly }) {
   }
 
   if (!user) {
+    if (staffOnly) {
+      return <Navigate to="/staff/login" state={{ from: location }} replace />;
+    }
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (staffOnly && user.role !== 'staff' && user.role !== 'admin') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/staff/login" replace />;
   }
 
   return children;
@@ -55,6 +59,7 @@ function AppRoutes() {
         <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailPage /></ProtectedRoute>} />
         <Route path="/staff" element={<ProtectedRoute staffOnly><StaffDashboard /></ProtectedRoute>} />
+        <Route path="/staff/login" element={<StaffLoginPage />} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

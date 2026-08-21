@@ -1,13 +1,12 @@
 // pages/HomePage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api/client';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import './HomePage.css';
 
-// Jumia-style categorized marketplace inventory based on the official Halfcon product & service line
+// Jumia-style categorized marketplace inventory
 const MARKETPLACE_CATEGORIES = [
   { id: 'all', label: 'All Items & Services', icon: '✨' },
   { id: 'appliances', label: 'Electrical & Power', icon: '⚡' },
@@ -19,13 +18,12 @@ const MARKETPLACE_CATEGORIES = [
 ];
 
 const MARKETPLACE_ITEMS = [
-  // Electrical & Power
   {
     id: 'mkt-1',
     category: 'appliances',
     name: 'Haisic 5KVA Hybrid Solar Inverter + Lithium Battery System',
     originalPrice_cents: 185000000,
-    price_cents: 148000000, // 20% off
+    price_cents: 148000000,
     discount: '20% OFF',
     rating: 4.9,
     reviews: 142,
@@ -62,11 +60,9 @@ const MARKETPLACE_ITEMS = [
     tag: 'Pro Builder',
     unit: 'Pack',
     icon: '⚡',
-    desc: 'Complete building electrical kit: flame-retardant single/double copper cables, modular switches, sockets, and junction boxes.',
+    desc: 'Complete building electrical kit: flame-retardant copper cables, modular switches, sockets, and junction boxes.',
     specs: ['100% Pure Copper Cores', 'Flame-Retardant PVC Insulation', 'Includes 10 Sockets + 10 Switches', 'Certified for Nigerian Grid'],
   },
-
-  // AC & Climate Cooling
   {
     id: 'mkt-4',
     category: 'ac-cooling',
@@ -97,8 +93,6 @@ const MARKETPLACE_ITEMS = [
     desc: 'Complete AC chemical coil washing, gas pressure leak detection, freon top-up, and electrical condenser optimization.',
     specs: ['Certified HVAC Technician On-Site', 'Full Chemical Coil & Filter Wash', 'Freon R410A / R22 Pressure Check', '30-Day Service Guarantee'],
   },
-
-  // Cleaning & Maintenance
   {
     id: 'mkt-6',
     category: 'cleaning',
@@ -126,7 +120,7 @@ const MARKETPLACE_ITEMS = [
     tag: 'Equipment',
     unit: 'Machine',
     icon: '🚿',
-    desc: 'Heavy-duty 160-bar high pressure washer for car detailing, driveway paving restoration, compound washing, and compound cleaning.',
+    desc: 'Heavy-duty 160-bar high pressure washer for car detailing, driveway paving restoration, and compound washing.',
     specs: ['2200W Induction Motor', '160 Bar Max Pressure', '10m Steel Reinforced High Pressure Hose', 'Foam Cannon Attachment Included'],
   },
   {
@@ -144,8 +138,6 @@ const MARKETPLACE_ITEMS = [
     desc: 'Heavy-duty rotary machine floor scrubbing, tile grout descaling, marble crystallisation, and high-gloss polish for homes & offices.',
     specs: ['Industrial Single-Disc Floor Scrubber', 'Marble & Terrazzo Crystallization', 'Removes 100% Grout Grime & Wax Build-up', 'Eco-Friendly Shine Sealant'],
   },
-
-  // Curtains & Window Blinds
   {
     id: 'mkt-9',
     category: 'curtains',
@@ -176,8 +168,6 @@ const MARKETPLACE_ITEMS = [
     desc: 'Sleek sunscreen and blackout roller blinds, vertical louvers, and wooden Venetian blinds for contemporary executive spaces.',
     specs: ['UV & Heat Reflective Fabric', 'Smooth Chain / Remote Control Mechanism', 'Anti-Static Dust Resistant Surface', 'Custom Sized to Exact Window Frame'],
   },
-
-  // Kitchen & POP Interior
   {
     id: 'mkt-11',
     category: 'interior',
@@ -223,8 +213,6 @@ const MARKETPLACE_ITEMS = [
     desc: 'Architectural Plaster of Paris (POP) ceiling design with geometric layered profiles, cove lighting slots, and spotlight distribution.',
     specs: ['Reinforced Gypsum Plaster Framework', 'Dual-Color Warm & White Hidden LED Coves', 'Anti-Sagging Heavy Gauge Hangers', 'Smooth Flawless Screeding & Finish'],
   },
-
-  // Plumbing
   {
     id: 'mkt-14',
     category: 'plumbing',
@@ -242,6 +230,93 @@ const MARKETPLACE_ITEMS = [
   },
 ];
 
+// Cost Estimator Project Types & Scale Options
+const ESTIMATOR_PROJECTS = [
+  {
+    id: 'solar',
+    title: 'Solar & Inverter Installation',
+    icon: '🔋',
+    options: [
+      { label: '1KVA Essential (Lights, TV, Fans)', originalCents: 56000000, priceCents: 45000000 },
+      { label: '3.5KVA Home Setup (Fridge + TV + All Lights)', originalCents: 118000000, priceCents: 95000000 },
+      { label: '5KVA Full Residence (1 Inverter AC + Fridge + Home)', originalCents: 185000000, priceCents: 148000000 },
+      { label: '10KVA Commercial / Duplex Heavy Setup', originalCents: 400000000, priceCents: 320000000 },
+    ],
+  },
+  {
+    id: 'rewiring',
+    title: 'Electrical Rewiring & Surge Protection',
+    icon: '⚡',
+    options: [
+      { label: '1-Bedroom / Studio Apartment', originalCents: 22500000, priceCents: 18000000 },
+      { label: '2-Bedroom Apartment / Flat', originalCents: 35000000, priceCents: 28000000 },
+      { label: '3-Bedroom Flat / Office Unit', originalCents: 47500000, priceCents: 38000000 },
+      { label: '4-5 Bedroom Duplex / Commercial Building', originalCents: 77500000, priceCents: 62000000 },
+    ],
+  },
+  {
+    id: 'kitchen',
+    title: 'Modular Kitchen Cabinetry & LED Fit-Out',
+    icon: '🍳',
+    options: [
+      { label: 'Compact Linear Kitchen (8 Feet)', originalCents: 65000000, priceCents: 52000000 },
+      { label: 'L-Shaped Family Kitchen (12 Feet)', originalCents: 106000000, priceCents: 85000000 },
+      { label: 'Luxury Island Kitchen (16+ Feet + Quartz Island)', originalCents: 206000000, priceCents: 165000000 },
+    ],
+  },
+  {
+    id: 'cleaning',
+    title: 'Deep Floor Scrubbing & Tile Polish',
+    icon: '✨',
+    options: [
+      { label: 'Standard Flat / Office (Up to 100 sqm)', originalCents: 12000000, priceCents: 9600000 },
+      { label: 'Large Residence / Hall (Up to 250 sqm)', originalCents: 23800000, priceCents: 19000000 },
+      { label: 'Commercial Compound (Up to 500 sqm)', originalCents: 43800000, priceCents: 35000000 },
+    ],
+  },
+  {
+    id: 'blinds',
+    title: 'Luxury Drapes & Motorized Window Blinds',
+    icon: '🪟',
+    options: [
+      { label: '2 Main Windows (Living Room)', originalCents: 16000000, priceCents: 12800000 },
+      { label: '5 Windows (Full 2-Bed Flat)', originalCents: 36200000, priceCents: 29000000 },
+      { label: '10+ Windows (Full House / Duplex)', originalCents: 68800000, priceCents: 55000000 },
+    ],
+  },
+];
+
+// Before & After Project Social Proof
+const BEFORE_AFTER_PROJECTS = [
+  {
+    title: 'Lekki Phase 1 Luxury Residence',
+    category: 'Modular Kitchen Fit-Out',
+    beforeDesc: 'Outdated dark wooden cabinets with broken drawers.',
+    afterDesc: 'High-gloss acrylic modular cabinets, quartz island & warm LED strips.',
+    badge: '100% Completed',
+    client: 'Mr. & Mrs. Adeleke',
+    quote: '"Halfcon delivered beyond expectations. The 3D render was accurate and finish flawless."',
+  },
+  {
+    title: 'Ikeja GRA Corporate Office',
+    category: '5KVA Hybrid Solar Inverter System',
+    beforeDesc: 'Heavy ₦450k monthly generator diesel bills with constant power cuts.',
+    afterDesc: 'Seamless 24/7 solar power transition with 0ms cut-over.',
+    badge: 'Verified Commercial',
+    client: 'Apex Global Logistics',
+    quote: '"We reduced energy costs by 75% in the first month. Excellent technician support."',
+  },
+  {
+    title: 'Victoria Island Penthouse',
+    category: 'POP Ceiling & Architectural Lighting',
+    beforeDesc: 'Plain concrete ceiling with exposed electrical wiring conduits.',
+    afterDesc: 'Geometric POP false ceiling with smart warm & daylight cove lighting.',
+    badge: '5-Star Rating',
+    client: 'Engr. D. Balogun',
+    quote: '"Cleanest tradespeople in Lagos. Arrived on time and cleaned up afterwards."',
+  },
+];
+
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -249,8 +324,20 @@ export default function HomePage() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [addedToast, setAddedToast] = useState(null);
 
+  // Estimator State
+  const [activeProjectIdx, setActiveProjectIdx] = useState(0);
+  const [activeOptionIdx, setActiveOptionIdx] = useState(1);
+
+  // Free Inspection Modal State
+  const [inspectionModalOpen, setInspectionModalOpen] = useState(false);
+  const [inspForm, setInspForm] = useState({ name: '', phone: '', address: '', projectType: 'Solar & Inverter Setup', date: '' });
+  const [inspSubmitted, setInspSubmitted] = useState(false);
+
   const { addItem } = useCart();
   const navigate = useNavigate();
+
+  const currentProject = ESTIMATOR_PROJECTS[activeProjectIdx];
+  const currentOption = currentProject.options[Math.min(activeOptionIdx, currentProject.options.length - 1)];
 
   const handleTrackSubmit = (e) => {
     e.preventDefault();
@@ -278,6 +365,37 @@ export default function HomePage() {
     setTimeout(() => setAddedToast(null), 3000);
   };
 
+  const handleBookEstimate = () => {
+    addItem(
+      {
+        id: `est-${currentProject.id}-${activeOptionIdx}`,
+        name: `${currentProject.title} — ${currentOption.label}`,
+        category: 'Project Quote',
+        price_cents: currentOption.priceCents,
+        unit: 'Project Scope',
+        description: `Instant online quotation locked with 20% discount. Free site inspection included.`,
+      },
+      1
+    );
+    navigate('/checkout');
+  };
+
+  const handleInspectionSubmit = (e) => {
+    e.preventDefault();
+    setInspSubmitted(true);
+    setTimeout(() => {
+      window.open(
+        whatsappLink(
+          `Hello Halfcon, I would like to book a Free Site Inspection:\nName: ${inspForm.name}\nPhone: ${inspForm.phone}\nProject: ${inspForm.projectType}\nAddress: ${inspForm.address}\nPreferred Date: ${inspForm.date}`
+        ),
+        '_blank'
+      );
+      setInspectionModalOpen(false);
+      setInspSubmitted(false);
+      setInspForm({ name: '', phone: '', address: '', projectType: 'Solar & Inverter Setup', date: '' });
+    }, 1500);
+  };
+
   const filteredItems = MARKETPLACE_ITEMS.filter((item) => {
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const matchesSearch =
@@ -292,7 +410,7 @@ export default function HomePage() {
       {/* ===== TOP PROMO MARQUEE BANNER ===== */}
       <div className="promo-top-bar">
         <div className="wrap promo-top-inner">
-          <div className="promo-badge">⚡ 20% DISCOUNT OFF ALL SERVICES &amp; APPLIANCES</div>
+          <div className="promo-badge">⚡ 20% DISCOUNT ON ALL SERVICES &amp; APPLIANCES — USE CODE: HALFCON20</div>
           <div className="promo-addresses">
             <span>📍 <strong>Ikorodu:</strong> {CONTACTS.addressIkorodu}</span>
             <span className="promo-sep">|</span>
@@ -332,9 +450,13 @@ export default function HomePage() {
                 Browse 20% Off Catalog
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </a>
-              <a href={whatsappLink("Hi Halfcon, I would like to make an instant order.")} target="_blank" rel="noopener noreferrer" className="cta-secondary">
-                Order on WhatsApp
-              </a>
+              <button
+                type="button"
+                className="cta-secondary"
+                onClick={() => setInspectionModalOpen(true)}
+              >
+                📅 Book Free Site Visit
+              </button>
             </div>
 
             {/* Quick Order Tracking */}
@@ -381,6 +503,130 @@ export default function HomePage() {
               />
               <div className="hero-flyer-ribbon">
                 <span className="ribbon-text">20% OFF ALL ORDERS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== TRUST & ESCROW GUARANTEE BAR ===== */}
+      <section className="guarantee-section">
+        <div className="wrap">
+          <div className="guarantee-grid">
+            <div className="guarantee-card">
+              <div className="guarantee-icon">🛡️</div>
+              <div>
+                <div className="guarantee-title">100% Escrow Protection</div>
+                <div className="guarantee-desc">Technicians are paid only after you inspect and sign off on completed work.</div>
+              </div>
+            </div>
+
+            <div className="guarantee-card">
+              <div className="guarantee-icon">⚡</div>
+              <div>
+                <div className="guarantee-title">6-Month Warranty</div>
+                <div className="guarantee-desc">Guaranteed free diagnostic &amp; remediation on all electrical &amp; plumbing installations.</div>
+              </div>
+            </div>
+
+            <div className="guarantee-card">
+              <div className="guarantee-icon">🚚</div>
+              <div>
+                <div className="guarantee-title">Same-Day Dispatch</div>
+                <div className="guarantee-desc">Rapid deployment from our dedicated Ikorodu and Alaba Market branch networks.</div>
+              </div>
+            </div>
+
+            <div className="guarantee-card">
+              <div className="guarantee-icon">👮‍♂️</div>
+              <div>
+                <div className="guarantee-title">Vetted Professionals</div>
+                <div className="guarantee-desc">100% background-checked, insured, and certified Nigerian technicians.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== INSTANT PROJECT COST ESTIMATOR & QUOTE GENERATOR ===== */}
+      <section className="estimator-section">
+        <div className="wrap">
+          <div className="estimator-box">
+            <div className="estimator-header">
+              <div className="section-eyebrow" style={{ color: '#FBBF24' }}>Instant Cost Calculator</div>
+              <h2 className="estimator-title">Get an Instant Project Estimate &amp; Save 20%</h2>
+              <p className="estimator-subtitle">
+                Select your project type and building size to calculate transparent Naira pricing with free engineer site inspection.
+              </p>
+            </div>
+
+            <div className="estimator-body">
+              {/* Project Type Selector */}
+              <div className="estimator-tabs">
+                {ESTIMATOR_PROJECTS.map((proj, idx) => (
+                  <button
+                    key={proj.id}
+                    type="button"
+                    className={`estimator-tab-btn ${activeProjectIdx === idx ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveProjectIdx(idx);
+                      setActiveOptionIdx(0);
+                    }}
+                  >
+                    <span>{proj.icon}</span>
+                    <span>{proj.title}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Scope Options */}
+              <div className="estimator-options">
+                <div className="options-label">Select Project Scope / Size:</div>
+                <div className="options-grid">
+                  {currentProject.options.map((opt, oIdx) => (
+                    <button
+                      key={oIdx}
+                      type="button"
+                      className={`option-btn ${activeOptionIdx === oIdx ? 'selected' : ''}`}
+                      onClick={() => setActiveOptionIdx(oIdx)}
+                    >
+                      <div className="option-label">{opt.label}</div>
+                      <div className="option-price">{formatNaira(opt.priceCents)}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Estimate Calculation Result Card */}
+              <div className="estimator-result-card">
+                <div className="result-left">
+                  <div className="result-tag">Estimated Package Total:</div>
+                  <div className="result-prices">
+                    <span className="result-price-current">{formatNaira(currentOption.priceCents)}</span>
+                    <span className="result-price-original">{formatNaira(currentOption.originalCents)}</span>
+                    <span className="result-saved-badge">20% Discount Applied</span>
+                  </div>
+                  <div className="result-note">Includes: Materials, certified labor, site preparation &amp; 6-month warranty.</div>
+                </div>
+
+                <div className="result-actions">
+                  <button
+                    type="button"
+                    className="btn btn-solid btn-lg"
+                    onClick={handleBookEstimate}
+                  >
+                    Lock 20% Off &amp; Book Online →
+                  </button>
+
+                  <a
+                    href={whatsappLink(`Hi Halfcon, I calculated a project estimate on your website for ${currentProject.title} (${currentOption.label}) at ${formatNaira(currentOption.priceCents)}. I would like to proceed.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-green btn-lg"
+                  >
+                    WhatsApp Quote
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -500,6 +746,48 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== BEFORE & AFTER SOCIAL PROOF SHOWCASE ===== */}
+      <section className="proof-section">
+        <div className="wrap">
+          <div className="section-header">
+            <div className="section-eyebrow">Proven Results</div>
+            <h2 className="section-title">Before &amp; After Project Showcase</h2>
+            <p className="section-desc">See the standard of workmanship we deliver across residential and commercial properties in Nigeria.</p>
+          </div>
+
+          <div className="proof-grid">
+            {BEFORE_AFTER_PROJECTS.map((proj, idx) => (
+              <div key={idx} className="proof-card">
+                <div className="proof-header">
+                  <div>
+                    <span className="proof-category">{proj.category}</span>
+                    <h3 className="proof-title">{proj.title}</h3>
+                  </div>
+                  <span className="badge badge-green">{proj.badge}</span>
+                </div>
+
+                <div className="proof-compare-box">
+                  <div className="compare-item before">
+                    <span className="compare-tag">Before:</span>
+                    <p>{proj.beforeDesc}</p>
+                  </div>
+                  <div className="compare-arrow">➔</div>
+                  <div className="compare-item after">
+                    <span className="compare-tag">After:</span>
+                    <p>{proj.afterDesc}</p>
+                  </div>
+                </div>
+
+                <div className="proof-quote">
+                  {proj.quote}
+                  <div className="quote-author">— {proj.client}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== PHYSICAL STORE LOCATIONS BANNER ===== */}
       <section className="locations-section">
         <div className="wrap">
@@ -599,6 +887,120 @@ export default function HomePage() {
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== FREE SITE INSPECTION MODAL ===== */}
+      {inspectionModalOpen && (
+        <div className="modal-overlay" onClick={() => setInspectionModalOpen(false)}>
+          <div className="modal-content" style={{ maxWidth: '540px' }} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="modal-close-btn"
+              onClick={() => setInspectionModalOpen(false)}
+            >
+              ✕
+            </button>
+
+            <div style={{ padding: '36px 32px' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  color: 'var(--rust)',
+                  background: 'var(--rust-light)',
+                  padding: '3px 10px',
+                  borderRadius: 'var(--radius-full)',
+                  marginBottom: '8px',
+                }}
+              >
+                Zero-Cost Consultation
+              </div>
+              <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '28px', fontWeight: 900, textTransform: 'uppercase', color: 'var(--ink)', marginBottom: '8px' }}>
+                Book a Free Engineer Site Visit
+              </h2>
+              <p style={{ fontSize: '13px', color: 'var(--steel)', marginBottom: '24px', lineHeight: 1.5 }}>
+                Our senior project supervisor will visit your residential or commercial site in Lagos to perform technical assessments and deliver an itemized quote.
+              </p>
+
+              {inspSubmitted ? (
+                <div className="success" style={{ padding: '20px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>Opening WhatsApp Hotline...</div>
+                  <div style={{ fontSize: '13px' }}>Your site inspection request is being transferred to our dispatch desk.</div>
+                </div>
+              ) : (
+                <form onSubmit={handleInspectionSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Your Full Name *</label>
+                    <input
+                      type="text"
+                      className="input"
+                      required
+                      placeholder="e.g. Chief Babatunde Adeleke"
+                      value={inspForm.name}
+                      onChange={(e) => setInspForm({ ...inspForm, name: e.target.value })}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Phone Number (WhatsApp) *</label>
+                    <input
+                      type="tel"
+                      className="input"
+                      required
+                      placeholder="e.g. 0803 123 4567"
+                      value={inspForm.phone}
+                      onChange={(e) => setInspForm({ ...inspForm, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Project Category *</label>
+                    <select
+                      className="input"
+                      value={inspForm.projectType}
+                      onChange={(e) => setInspForm({ ...inspForm, projectType: e.target.value })}
+                    >
+                      <option value="Solar & Inverter Setup">Solar &amp; Inverter Setup</option>
+                      <option value="Modular Kitchen & Wardrobe">Modular Kitchen &amp; Wardrobe</option>
+                      <option value="Full House Electrical Rewiring">Full House Electrical Rewiring</option>
+                      <option value="High-Rise Facade / Deep Cleaning">High-Rise Facade / Deep Cleaning</option>
+                      <option value="POP Ceilings & Interior Fit-Out">POP Ceilings &amp; Interior Fit-Out</option>
+                      <option value="Plumbing & Borehole Installation">Plumbing &amp; Borehole Installation</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Site Location / Address *</label>
+                    <textarea
+                      className="input"
+                      required
+                      placeholder="e.g. 15 Admiralty Way, Lekki Phase 1, Lagos"
+                      style={{ minHeight: '70px' }}
+                      value={inspForm.address}
+                      onChange={(e) => setInspForm({ ...inspForm, address: e.target.value })}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px' }}>Preferred Inspection Date</label>
+                    <input
+                      type="date"
+                      className="input"
+                      value={inspForm.date}
+                      onChange={(e) => setInspForm({ ...inspForm, date: e.target.value })}
+                    />
+                  </div>
+
+                  <button type="submit" className="btn btn-solid btn-lg" style={{ marginTop: '8px' }}>
+                    Confirm &amp; Dispatch Supervisor →
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>

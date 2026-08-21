@@ -270,6 +270,7 @@ export default function Layout() {
             <Link to="/" className="footer-link">Home</Link>
             <Link to="/services" className="footer-link">Catalog</Link>
             <Link to="/artisans" className="footer-link">Find Artisans</Link>
+            <Link to="/staff/login" className="footer-link" style={{ color: 'var(--rust)', fontWeight: 600 }}>Staff Portal Login</Link>
             <a href={`mailto:${CONTACTS.email}`} className="footer-link">Contact Support</a>
           </div>
 
