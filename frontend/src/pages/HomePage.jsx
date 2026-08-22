@@ -6,7 +6,7 @@ import { formatNaira } from '../utils/currency';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import './HomePage.css';
 
-// Jumia-style categorized marketplace inventory
+// Jumia-style categorized marketplace inventory with REAL stock product photography
 const MARKETPLACE_CATEGORIES = [
   { id: 'all', label: 'All Items & Services', icon: '✨' },
   { id: 'appliances', label: 'Electrical & Power', icon: '⚡' },
@@ -22,6 +22,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-1',
     category: 'appliances',
     name: 'Haisic 5KVA Hybrid Solar Inverter + Lithium Battery System',
+    image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 185000000,
     price_cents: 148000000,
     discount: '20% OFF',
@@ -29,7 +30,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 142,
     tag: 'Best Seller',
     unit: 'Complete Kit',
-    icon: '🔋',
     desc: 'Heavy-duty 5KVA hybrid pure sine-wave inverter with lithium iron phosphate battery backup. Perfect for residential homes and corporate offices.',
     specs: ['Pure Sine Wave 5KVA / 48V', 'Lithium LiFePO4 Battery Support', 'Automatic Grid / Generator / Solar Switching', '5-Year Warranty Included'],
   },
@@ -37,6 +37,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-2',
     category: 'appliances',
     name: 'Industrial Heavy-Duty Cable Extension Reel (50 Meters)',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 4500000,
     price_cents: 3600000,
     discount: '20% OFF',
@@ -44,7 +45,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 98,
     tag: 'Top Rated',
     unit: 'Roll',
-    icon: '🔌',
     desc: 'Rugged 50-meter heavy-duty cable extension reel with 4 surge-protected universal sockets and thermal safety cut-off.',
     specs: ['50m Heavy Gauge Copper Cable', '4 Surge Protected Sockets', 'High-Impact Drum with Carry Handle', 'Safety Overload Switch'],
   },
@@ -52,6 +52,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-3',
     category: 'appliances',
     name: 'Smart Home Electrical Cable & Wiring Fittings Bundle',
+    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 8500000,
     price_cents: 6800000,
     discount: '20% OFF',
@@ -59,7 +60,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 76,
     tag: 'Pro Builder',
     unit: 'Pack',
-    icon: '⚡',
     desc: 'Complete building electrical kit: flame-retardant copper cables, modular switches, sockets, and junction boxes.',
     specs: ['100% Pure Copper Cores', 'Flame-Retardant PVC Insulation', 'Includes 10 Sockets + 10 Switches', 'Certified for Nigerian Grid'],
   },
@@ -67,6 +67,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-4',
     category: 'ac-cooling',
     name: 'Haisic / Haier 1.5HP Inverter Split Air Conditioner',
+    image: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 42000000,
     price_cents: 33600000,
     discount: '20% OFF',
@@ -74,7 +75,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 110,
     tag: 'Popular',
     unit: 'Unit',
-    icon: '❄️',
     desc: 'High-efficiency fast-cooling inverter split AC with low-voltage startup, turbo mode, and anti-rust gold fin compressor.',
     specs: ['1.5 HP Fast Cooling Capacity', 'Up to 60% Energy Saving Inverter', 'Low Voltage Starter (130V-260V)', 'Installation Kit Included'],
   },
@@ -82,6 +82,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-5',
     category: 'ac-cooling',
     name: 'Outdoor Heavy-Duty AC Compressor Servicing & Recharge',
+    image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 1800000,
     price_cents: 1440000,
     discount: '20% OFF',
@@ -89,7 +90,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 84,
     tag: 'Service',
     unit: 'Per Unit',
-    icon: '🛠️',
     desc: 'Complete AC chemical coil washing, gas pressure leak detection, freon top-up, and electrical condenser optimization.',
     specs: ['Certified HVAC Technician On-Site', 'Full Chemical Coil & Filter Wash', 'Freon R410A / R22 Pressure Check', '30-Day Service Guarantee'],
   },
@@ -97,6 +97,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-6',
     category: 'cleaning',
     name: 'High-Rise Facade & Glass Window Rope-Access Cleaning',
+    image: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 25000000,
     price_cents: 20000000,
     discount: '20% OFF',
@@ -104,7 +105,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 62,
     tag: 'Industrial',
     unit: 'Per Building Scope',
-    icon: '🧗‍♂️',
     desc: 'Professional rope-access high-rise window washing, exterior building stain removal, and facade restoration for corporate towers.',
     specs: ['Certified Rope-Access Technicians', 'Streak-Free Hydro-Washing Solutions', 'Full Safety Rigging & Insurance', 'Alucobond & Glass Restoration'],
   },
@@ -112,6 +112,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-7',
     category: 'cleaning',
     name: 'Commercial High-Pressure Jet Washer (2200W / 160 Bar)',
+    image: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 11000000,
     price_cents: 8800000,
     discount: '20% OFF',
@@ -119,7 +120,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 95,
     tag: 'Equipment',
     unit: 'Machine',
-    icon: '🚿',
     desc: 'Heavy-duty 160-bar high pressure washer for car detailing, driveway paving restoration, and compound washing.',
     specs: ['2200W Induction Motor', '160 Bar Max Pressure', '10m Steel Reinforced High Pressure Hose', 'Foam Cannon Attachment Included'],
   },
@@ -127,6 +127,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-8',
     category: 'cleaning',
     name: 'Industrial Floor Buffing & Tile Scrubbing Deep Clean',
+    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 12000000,
     price_cents: 9600000,
     discount: '20% OFF',
@@ -134,7 +135,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 130,
     tag: 'House Care',
     unit: 'Per 150 sqm',
-    icon: '✨',
     desc: 'Heavy-duty rotary machine floor scrubbing, tile grout descaling, marble crystallisation, and high-gloss polish for homes & offices.',
     specs: ['Industrial Single-Disc Floor Scrubber', 'Marble & Terrazzo Crystallization', 'Removes 100% Grout Grime & Wax Build-up', 'Eco-Friendly Shine Sealant'],
   },
@@ -142,6 +142,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-9',
     category: 'curtains',
     name: 'Custom Luxury Drapes & Curtains (Empire, Pleat & Swags)',
+    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 16000000,
     price_cents: 12800000,
     discount: '20% OFF',
@@ -149,7 +150,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 154,
     tag: 'Luxury Decor',
     unit: 'Per Window Set',
-    icon: '🪟',
     desc: 'Bespoke interior drapery tailored in Empire, Overlapping Swags, French Pleat, Roller, Sandglass, and Italian styles.',
     specs: ['Blackout & Sheer Dual Layer Options', 'Heavyweight Jacquard / Velvet Fabrics', 'Includes Track Rail & Motorized Rods', 'Free On-Site Measurement & Fitting'],
   },
@@ -157,6 +157,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-10',
     category: 'curtains',
     name: 'Modern Motorized & Manual Vertical / Roller Blinds',
+    image: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 7500000,
     price_cents: 6000000,
     discount: '20% OFF',
@@ -164,7 +165,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 89,
     tag: 'Office & Home',
     unit: 'Per Window',
-    icon: '🏢',
     desc: 'Sleek sunscreen and blackout roller blinds, vertical louvers, and wooden Venetian blinds for contemporary executive spaces.',
     specs: ['UV & Heat Reflective Fabric', 'Smooth Chain / Remote Control Mechanism', 'Anti-Static Dust Resistant Surface', 'Custom Sized to Exact Window Frame'],
   },
@@ -172,6 +172,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-11',
     category: 'interior',
     name: 'Modern Modular Kitchen Build-Out with LED Accent Lighting',
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 65000000,
     price_cents: 52000000,
     discount: '20% OFF',
@@ -179,7 +180,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 78,
     tag: 'Interior Fit-Out',
     unit: 'Per Project',
-    icon: '🍳',
     desc: 'Full contemporary kitchen cabinetry with granite/quartz worktops, soft-close drawers, under-cabinet warm LED strips, and chimney hood.',
     specs: ['Moisture-Resistant High-Gloss HDF/MDF', 'Solid Quartz or Granite Countertop', 'Built-in Space for Oven & Dishwasher', '3D Architecture Render Prior to Build'],
   },
@@ -187,6 +187,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-12',
     category: 'interior',
     name: 'Walk-In Closet & Master Wardrobe System',
+    image: 'https://images.unsplash.com/photo-1558997519-83ea9252def8?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 38000000,
     price_cents: 30400000,
     discount: '20% OFF',
@@ -194,7 +195,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 67,
     tag: 'Custom Joinery',
     unit: 'Per Room',
-    icon: '👔',
     desc: 'Custom master walk-in wardrobe featuring multi-tier shelving, shoe racks, integrated mirror vanities, and artificial grass/turf accents.',
     specs: ['Full Floor-to-Ceiling Shelving', 'Integrated LED Motion Sensor Lights', 'Velvet Jewelry Drawers & Hanger Bars', 'Custom Compartments for 100+ Pairs of Shoes'],
   },
@@ -202,6 +202,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-13',
     category: 'interior',
     name: 'Luxury POP False Ceiling with Recessed Warm Strip Lighting',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 22000000,
     price_cents: 17600000,
     discount: '20% OFF',
@@ -209,7 +210,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 93,
     tag: 'POP Ceiling',
     unit: 'Per Living Area',
-    icon: '💡',
     desc: 'Architectural Plaster of Paris (POP) ceiling design with geometric layered profiles, cove lighting slots, and spotlight distribution.',
     specs: ['Reinforced Gypsum Plaster Framework', 'Dual-Color Warm & White Hidden LED Coves', 'Anti-Sagging Heavy Gauge Hangers', 'Smooth Flawless Screeding & Finish'],
   },
@@ -217,6 +217,7 @@ const MARKETPLACE_ITEMS = [
     id: 'mkt-14',
     category: 'plumbing',
     name: 'PPR & PVC Plumbing Pipes and Pressure Fittings Bundle',
+    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=800&q=80',
     originalPrice_cents: 9500000,
     price_cents: 7600000,
     discount: '20% OFF',
@@ -224,7 +225,6 @@ const MARKETPLACE_ITEMS = [
     reviews: 82,
     tag: 'Building Supplies',
     unit: 'Bundle',
-    icon: '🔧',
     desc: 'High-pressure PPR hot/cold water distribution pipes, PVC waste conduits, elbows, union joints, and brass gate valves.',
     specs: ['PN20 High Pressure Rated PPR', 'UV & Corrosion Resistant Material', 'Includes 20 Pipes + 50 Assorted Fittings', 'Guaranteed Leak-Free Thermal Fusion'],
   },
@@ -633,7 +633,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== JUMIA-STYLE MARKETPLACE & SERVICE GALLERY ===== */}
+      {/* ===== JUMIA-STYLE MARKETPLACE & SERVICE GALLERY (WITH REAL STOCK PHOTOS) ===== */}
       <section id="marketplace" className="marketplace-section">
         <div className="wrap">
           {/* Section Header */}
@@ -641,7 +641,7 @@ export default function HomePage() {
             <div>
               <div className="section-eyebrow">Interactive Catalog</div>
               <h2 className="section-title">Explore Halfcon Products &amp; Services</h2>
-              <p className="section-desc">Click any item for instant specifications, pricing discounts, and direct checkout.</p>
+              <p className="section-desc">Click any product photo for instant specifications, 20% discount pricing, and direct checkout.</p>
             </div>
 
             {/* Search Input */}
@@ -681,7 +681,7 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Products & Services Grid */}
+          {/* Products & Services Grid with Real Stock Images */}
           <div className="marketplace-grid">
             {filteredItems.map((item) => (
               <div
@@ -692,9 +692,18 @@ export default function HomePage() {
                 {/* Discount Badge */}
                 <div className="mkt-discount-badge">{item.discount}</div>
 
-                {/* Card Icon Header */}
-                <div className="mkt-card-img-placeholder">
-                  <span className="mkt-icon-large">{item.icon}</span>
+                {/* Real Product Stock Photo */}
+                <div className="mkt-card-img-wrap">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    loading="lazy"
+                    className="mkt-product-img"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+                    }}
+                  />
                   <span className="mkt-tag-chip">{item.tag}</span>
                 </div>
 
@@ -818,7 +827,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== QUICK DETAIL MODAL (JUMIA STYLE) ===== */}
+      {/* ===== QUICK DETAIL MODAL WITH REAL STOCK PRODUCT IMAGE ===== */}
       {activeModalItem && (
         <div className="modal-overlay" onClick={() => setActiveModalItem(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -833,7 +842,15 @@ export default function HomePage() {
 
             <div className="modal-grid">
               <div className="modal-img-col">
-                <div className="modal-icon-display">{activeModalItem.icon}</div>
+                <img
+                  src={activeModalItem.image}
+                  alt={activeModalItem.name}
+                  className="modal-product-img"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+                  }}
+                />
                 <div className="mkt-discount-badge" style={{ top: '16px', left: '16px' }}>{activeModalItem.discount}</div>
               </div>
 
