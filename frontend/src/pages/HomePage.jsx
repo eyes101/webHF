@@ -437,8 +437,8 @@ export default function HomePage() {
             </div>
 
             <h1 className="hero-title">
-              Operations, Home Care &amp;<br />
-              <span className="hero-title-accent">Electrical Systems</span> Built for You.
+              Home Care &amp; Property Maintenance with<br />
+              <span className="hero-title-accent">Electrical &amp; Electronics</span> Sales.
             </h1>
 
             <p className="hero-desc">
