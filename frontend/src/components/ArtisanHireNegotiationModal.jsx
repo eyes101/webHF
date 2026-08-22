@@ -49,17 +49,17 @@ const PILLAR_ARTISANS_MAP = {
     ],
   },
   property: {
-    title: 'Property Care & Structural Masonry',
-    icon: '🏢',
+    title: 'Building Maintenance & Surface Care',
+    icon: '🏠',
     artisans: [
-      { id: 'art-7', name: 'Ibrahim Musa', trade: 'Mason & Structural Finisher', rating: 4.9, jobs: 172, baseLaborNaira: 28000, verified: true, skills: ['Blockwork', 'Waterproofing', 'Plastering', 'Screeding'] },
+      { id: 'art-7', name: 'Ibrahim Musa', trade: 'Mason & Surface Finisher', rating: 4.9, jobs: 172, baseLaborNaira: 28000, verified: true, skills: ['Tile Repairs', 'Waterproofing', 'Wall Patching', 'Screeding'] },
       { id: 'art-8', name: 'Grace Nnamdi', trade: 'Master Painter & Colorist', rating: 4.9, jobs: 115, baseLaborNaira: 24000, verified: true, skills: ['Weather-Shield Exterior', 'Interior Wall Screeding', 'Moisture Sealing'] },
     ],
     commonTasks: [
-      { title: 'Complete Building Interior & Exterior Painting', defaultMaterials: 220000, defaultLabor: 95000 },
-      { title: 'Bituminous Roof Waterproofing & Storm Leak Seal', defaultMaterials: 110000, defaultLabor: 50000 },
-      { title: 'Masonry Screeding, Plastering & Perimeter Wall Reinforce', defaultMaterials: 160000, defaultLabor: 75000 },
-      { title: 'Full Structural & MEP Safety Facility Audit', defaultMaterials: 15000, defaultLabor: 60000 },
+      { title: 'Interior & Exterior Weather-Shield Painting', defaultMaterials: 180000, defaultLabor: 75000 },
+      { title: 'Bituminous Roof Waterproofing & Leak Sealing', defaultMaterials: 95000, defaultLabor: 45000 },
+      { title: 'Porcelain Tile Re-Grouting & Surface Crack Patching', defaultMaterials: 40000, defaultLabor: 30000 },
+      { title: 'Wall Plastering, Screeding & Damp Proofing', defaultMaterials: 55000, defaultLabor: 35000 },
     ],
   },
 };

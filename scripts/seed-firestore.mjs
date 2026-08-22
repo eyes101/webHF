@@ -27,11 +27,11 @@ const services = [
   { category: 'Carpentry & Interiors', name: 'Door Joinery & Security Lock Fitting', description: 'Hardwood security doors, reinforced frames, digital smart door locks, and architectural hardware.', price_cents: 9500000, unit: 'flat' },
   { category: 'Carpentry & Interiors', name: 'Floor Tiling & Wooden Decking', description: 'Precision porcelain, marble, or interlocking tile laying and outdoor treated wooden deck styling.', price_cents: 15000000, unit: 'per area' },
 
-  // 4. Property Management & Structural Care
-  { category: 'Property Management', name: 'Complete Exterior & Interior Painting', description: 'Surface preparation, moisture-seal primer, crack filling, and premium weather-shield emulsion coats.', price_cents: 32000000, unit: 'per building' },
-  { category: 'Property Management', name: 'Roof Waterproofing & Storm Leak Repair', description: 'Bituminous membrane waterproofing, gutter realignment, and roof sheet leak sealing.', price_cents: 16000000, unit: 'per roof' },
-  { category: 'Property Management', name: 'Facility Inspection & Preventive Audit', description: 'Comprehensive structural, electrical, and plumbing safety audit with detailed remediation reports.', price_cents: 12000000, unit: 'per audit' },
-  { category: 'Property Management', name: 'Masonry, Plastering & Perimeter Fencing', description: 'Blockwork construction, damp-proof screeding, perimeter wall reinforcement, and razor wire.', price_cents: 25000000, unit: 'per project' },
+  // 4. Building Maintenance & Surface Repairs
+  { category: 'Building Maintenance', name: 'Complete Exterior & Interior Painting', description: 'Surface preparation, moisture-seal primer, crack filling, and premium weather-shield emulsion coats.', price_cents: 32000000, unit: 'per building' },
+  { category: 'Building Maintenance', name: 'Roof Waterproofing & Storm Leak Repair', description: 'Bituminous membrane waterproofing, gutter realignment, and roof sheet leak sealing.', price_cents: 16000000, unit: 'per roof' },
+  { category: 'Building Maintenance', name: 'Tile Re-Grouting & Surface Patching', description: 'Precision porcelain tile re-grouting, marble polish restoration, and surface crack sealing.', price_cents: 12000000, unit: 'flat' },
+  { category: 'Building Maintenance', name: 'Wall Plastering, Screeding & Damp Proofing', description: 'Damp-proof wall plastering, smooth putty screeding, and protective moisture seal.', price_cents: 18000000, unit: 'per project' },
 
   // 5. Logistics & Special Duties
   { category: 'Logistics Service', name: 'Inter-State Logistics Coordination', description: 'Coordinated freight movement and scheduled haulage between major Nigerian state capitals.', price_cents: 6000000, unit: 'flat' },

@@ -54,17 +54,17 @@ const PROPERTY_PILLARS = [
   },
   {
     id: 'property',
-    category: 'Property Management',
-    title: 'Property & Structures',
-    icon: '🏢',
+    category: 'Building Maintenance',
+    title: 'Maintenance & Surface Care',
+    icon: '🏠',
     color: '#16A34A',
     bg: '#DCFCE7',
-    desc: 'Complete building renovations, waterproofing, masonry & safety audits.',
+    desc: 'Weather-shield painting, roof waterproofing, tile re-grouting & surface patching.',
     highlights: [
-      'Weather-shield interior & exterior painting',
-      'Bituminous membrane roof waterproofing',
-      'Full structural & MEP facility audits',
-      'Masonry, plastering & perimeter fencing',
+      'Interior & exterior weather-shield painting',
+      'Bituminous membrane roof leak waterproofing',
+      'Porcelain tile re-grouting & floor repair',
+      'Wall crack masonry patching & smooth screeding',
     ],
   },
 ];
@@ -135,7 +135,7 @@ export default function ServicesPage() {
             marginBottom: '12px',
           }}
         >
-          Comprehensive Solutions
+          Maintenance &amp; Sales Solutions
         </div>
         <h1
           style={{
@@ -149,19 +149,19 @@ export default function ServicesPage() {
             marginBottom: '14px',
           }}
         >
-          Services &amp; Property Catalog
+          Services &amp; Maintenance Catalog
         </h1>
         <p style={{ color: 'var(--steel)', fontSize: '16px', lineHeight: 1.6 }}>
-          From full residential development and preventive property maintenance to express logistics and specialized operational duties across Nigeria.
+          Professional home maintenance, technician repairs, genuine electrical &amp; electronics supplies, and express logistics across Nigeria.
         </p>
       </div>
 
-      {/* 4-COLUMN HOME MAINTENANCE & PROPERTY PILLARS WITH P2P ARTISAN HIRING */}
+      {/* 4-COLUMN HOME MAINTENANCE & REPAIR PILLARS WITH P2P ARTISAN HIRING */}
       <section style={{ marginBottom: '56px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '26px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ink)' }}>
-              Home Maintenance &amp; Property Pillars
+              Home Maintenance &amp; Repair Pillars
             </h2>
             <div style={{ fontSize: '13px', color: 'var(--steel)' }}>
               Click any pillar to filter services, or click <strong>Hire Artisan</strong> to negotiate custom task scopes with escrow protection.

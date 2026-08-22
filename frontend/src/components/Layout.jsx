@@ -244,7 +244,7 @@ export default function Layout() {
               </span>
             </Link>
             <p className="footer-blurb">
-              Nigeria's premier logistics, special duties, and property development company. Delivering excellence across the nation.
+              Nigeria's trusted home care, property maintenance, and electrical &amp; electronics sales company. Delivering excellence across the nation.
             </p>
             <div className="footer-socials">
               <a href={CONTACTS.instagramUrl} target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="Instagram">
@@ -257,11 +257,11 @@ export default function Layout() {
           </div>
 
           <div className="footer-col">
-            <div className="footer-heading">Services</div>
+            <div className="footer-heading">Services &amp; Sales</div>
+            <Link to="/services?category=Electrical" className="footer-link">Electrical &amp; Electronics Sales</Link>
+            <Link to="/services?category=Maintenance" className="footer-link">Home Maintenance &amp; Repairs</Link>
             <Link to="/services?category=Logistics" className="footer-link">Express Logistics</Link>
             <Link to="/services?category=Special%20Duties" className="footer-link">Special Duties</Link>
-            <Link to="/services?category=Property" className="footer-link">Property Development</Link>
-            <Link to="/services" className="footer-link">Corporate Fulfillment</Link>
             <Link to="/artisans" className="footer-link">Verified Artisans</Link>
           </div>
 
