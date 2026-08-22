@@ -109,6 +109,7 @@ export default function Layout() {
 
             <nav className="nav">
               <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>Home</Link>
+              <a href="/#marketplace" className="nav-link">Products</a>
               <Link to="/services" className={location.pathname === '/services' && !location.search ? 'nav-link active' : 'nav-link'}>All Services</Link>
               <Link to="/services?category=Logistics" className={location.search.includes('Logistics') ? 'nav-link active' : 'nav-link'}>Logistics</Link>
               <Link to="/services?category=Special%20Duties" className={location.search.includes('Special') ? 'nav-link active' : 'nav-link'}>Special Duties</Link>
@@ -209,6 +210,7 @@ export default function Layout() {
         {menuOpen && (
           <div className="mobile-menu">
             <Link to="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
+            <a href="/#marketplace" className="mobile-link" onClick={() => setMenuOpen(false)}>Products</a>
             <Link to="/services" className="mobile-link" onClick={() => setMenuOpen(false)}>All Services</Link>
             <Link to="/services?category=Logistics" className="mobile-link" onClick={() => setMenuOpen(false)}>Logistics</Link>
             <Link to="/services?category=Special%20Duties" className="mobile-link" onClick={() => setMenuOpen(false)}>Special Duties</Link>
@@ -257,7 +259,8 @@ export default function Layout() {
           </div>
 
           <div className="footer-col">
-            <div className="footer-heading">Services &amp; Sales</div>
+            <div className="footer-heading">Services &amp; Products</div>
+            <a href="/#marketplace" className="footer-link">Products &amp; Appliances</a>
             <Link to="/services?category=Electrical" className="footer-link">Electrical &amp; Electronics Sales</Link>
             <Link to="/services?category=Maintenance" className="footer-link">Home Maintenance &amp; Repairs</Link>
             <Link to="/services?category=Logistics" className="footer-link">Express Logistics</Link>
