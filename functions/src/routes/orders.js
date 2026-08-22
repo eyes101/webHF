@@ -1,41 +1,53 @@
 // src/routes/orders.js
-//
-// Order items are embedded directly in the order document (an array field)
-// rather than a separate collection — Firestore doesn't do SQL-style joins,
-// and items are always created and read together with their order, so
-// embedding is the natural fit here (unlike payments, which staff need to
-// browse independently across all orders — those stay a top-level collection).
 import { db, admin } from '../firestore.js';
 import { requireAuth, requireRole } from '../middleware/requireAuth.js';
 
 const VALID_STATUSES = ['pending', 'awaiting_payment', 'paid', 'in_progress', 'completed', 'cancelled'];
 
 export function registerOrderRoutes(app) {
-  // POST /api/orders — customer creates an order (cart of service line items)
+  // POST /api/orders — customer creates an order (cart of service / product line items)
   app.post('/api/orders', requireAuth, async (req, res) => {
     const { items, notes, address, scheduled_for } = req.body;
     if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'items must be a non-empty array of { service_id, quantity }' });
+      return res.status(400).json({ error: 'items must be a non-empty array of items' });
     }
 
-    // Validate services & compute total server-side (never trust client-sent prices)
+    // Validate services & products and compute total
     let totalCents = 0;
     const resolvedItems = [];
     for (const item of items) {
-      const serviceSnap = await db.collection('services').doc(item.service_id).get();
-      if (!serviceSnap.exists || !serviceSnap.data().active) {
-        return res.status(400).json({ error: `Service ${item.service_id} not found or inactive` });
+      let unitPriceCents = 0;
+      let serviceName = item.name || 'Service / Product';
+      let serviceCategory = item.category || 'General';
+
+      if (item.service_id) {
+        const serviceSnap = await db.collection('services').doc(item.service_id).get();
+        if (serviceSnap.exists && serviceSnap.data().active) {
+          const service = serviceSnap.data();
+          unitPriceCents = service.price_cents;
+          serviceName = service.name;
+          serviceCategory = service.category;
+        } else if (item.price_cents && item.price_cents > 0) {
+          // Marketplace product, cost estimator quote, or custom escrow contract
+          unitPriceCents = parseInt(item.price_cents, 10);
+        } else {
+          return res.status(400).json({ error: `Service or product item ${item.service_id} could not be resolved.` });
+        }
+      } else if (item.price_cents && item.price_cents > 0) {
+        unitPriceCents = parseInt(item.price_cents, 10);
+      } else {
+        return res.status(400).json({ error: 'Invalid order line item.' });
       }
-      const service = serviceSnap.data();
+
       const quantity = Math.max(1, parseInt(item.quantity, 10) || 1);
-      const subtotal = service.price_cents * quantity;
+      const subtotal = unitPriceCents * quantity;
       totalCents += subtotal;
       resolvedItems.push({
-        service_id: item.service_id,
-        service_name: service.name,
-        service_category: service.category,
+        service_id: item.service_id || 'custom-item',
+        service_name: serviceName,
+        service_category: serviceCategory,
         quantity,
-        unit_price_cents: service.price_cents,
+        unit_price_cents: unitPriceCents,
         subtotal_cents: subtotal,
       });
     }

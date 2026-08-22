@@ -1,6 +1,6 @@
 // pages/RegisterPage.jsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../components/Auth.css';
 
@@ -18,6 +18,8 @@ export default function RegisterPage() {
 
   const { register, loginWithGoogle, loginWithFacebook, resendVerificationEmail } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +52,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await loginWithGoogle();
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (err) {
       setFormError(err.message);
     } finally {
@@ -63,7 +65,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await loginWithFacebook();
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (err) {
       setFormError(err.message);
     } finally {

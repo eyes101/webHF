@@ -50,7 +50,14 @@ export default function CheckoutPage() {
 
     try {
       const res = await api.orders.create(
-        items.map((i) => ({ service_id: i.id, quantity: i.quantity })),
+        items.map((i) => ({
+          service_id: i.id,
+          quantity: i.quantity,
+          name: i.name,
+          category: i.category,
+          price_cents: i.price_cents,
+          unit: i.unit,
+        })),
         notes,
         address,
         scheduledFor
