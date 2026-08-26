@@ -21,8 +21,13 @@ const MARKETPLACE_ITEMS = [
   {
     id: 'mkt-1',
     category: 'appliances',
-    name: 'Haisic 5KVA Hybrid Solar Inverter + Lithium Battery System',
-    image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=800&q=80',
+    name: 'All-in-One ESS 5KVA Hybrid Solar Inverter + Lithium Battery System',
+    image: '/images/solar-all-in-one-ess.jpg',
+    gallery: [
+      '/images/solar-all-in-one-ess.jpg',
+      '/images/demuda-deye-hybrid-inverter.jpg',
+      '/images/solar-panels-monocrystalline.jpg',
+    ],
     originalPrice_cents: 185000000,
     price_cents: 148000000,
     discount: '20% OFF',
@@ -30,8 +35,13 @@ const MARKETPLACE_ITEMS = [
     reviews: 142,
     tag: 'Best Seller',
     unit: 'Complete Kit',
-    desc: 'Heavy-duty 5KVA hybrid pure sine-wave inverter with lithium iron phosphate battery backup. Perfect for residential homes and corporate offices.',
-    specs: ['Pure Sine Wave 5KVA / 48V', 'Lithium LiFePO4 Battery Support', 'Automatic Grid / Generator / Solar Switching', '5-Year Warranty Included'],
+    desc: 'Heavy-duty All-in-One ESS (5KWh + 5KW / 2.5KWh + 3KW) integrated pure sine-wave hybrid inverter with LiFePO4 lithium battery backup and intelligent energy management.',
+    specs: [
+      'All-in-One ESS Integrated Inverter + Lithium Battery (700x500x140mm)',
+      'Pure Sine Wave 5KW Output / 5KWh Lithium LiFePO4 Storage',
+      'Dual MPPT Solar Charging + Automatic Grid / Generator Transfer',
+      '5-Year Official Warranty + Full Installation Kit Included',
+    ],
   },
   {
     id: 'mkt-2',
@@ -318,6 +328,56 @@ const MARKETPLACE_ITEMS = [
     desc: 'Industrial-grade 4mm APP modified bitumen roofing membrane with polyester reinforcement for complete concrete slab and parapet waterproofing.',
     specs: ['4mm Thickness Reinforced Polymer', '10-Meter x 1-Meter Full Roll', 'High Elasticity & Thermal Tolerance', 'Permanently Stops Concrete Slab Leaks'],
   },
+  {
+    id: 'mkt-21',
+    category: 'appliances',
+    name: 'DEMUDA / Deye 5KW Pure Sine Wave Smart Hybrid Inverter',
+    image: '/images/demuda-deye-hybrid-inverter.jpg',
+    gallery: [
+      '/images/demuda-deye-hybrid-inverter.jpg',
+      '/images/solar-all-in-one-ess.jpg',
+      '/images/solar-panels-monocrystalline.jpg',
+    ],
+    originalPrice_cents: 95000000,
+    price_cents: 76000000,
+    discount: '20% OFF',
+    rating: 4.9,
+    reviews: 87,
+    tag: 'Smart Storage',
+    unit: 'Unit',
+    desc: 'Intelligent high-efficiency hybrid solar energy storage inverter with smart LCD touchscreen, IP65 weather-proof casing, and WiFi cloud monitoring.',
+    specs: [
+      '5KW Pure Sine Wave Output (48V System)',
+      'Intelligent Touch LCD Display with Real-Time Power Flow',
+      'CE / RoHS / EMC Certified Heavy-Duty Engineering',
+      'Compatible with Lead-Acid & LiFePO4 Lithium Batteries',
+    ],
+  },
+  {
+    id: 'mkt-22',
+    category: 'appliances',
+    name: 'Tier-1 High-Efficiency Monocrystalline Solar PV Panels (Pair)',
+    image: '/images/solar-panels-monocrystalline.jpg',
+    gallery: [
+      '/images/solar-panels-monocrystalline.jpg',
+      '/images/solar-all-in-one-ess.jpg',
+      '/images/demuda-deye-hybrid-inverter.jpg',
+    ],
+    originalPrice_cents: 28000000,
+    price_cents: 22400000,
+    discount: '20% OFF',
+    rating: 5.0,
+    reviews: 104,
+    tag: 'High Yield',
+    unit: 'Pair (2 Panels)',
+    desc: 'High-yield Monocrystalline Half-Cut Cell Solar Panels with anti-reflective tempered glass and weather-sealed anodized aluminum framing.',
+    specs: [
+      'High Efficiency Monocrystalline Half-Cut Cell Architecture',
+      'Anti-Reflective Weather-Shield Tempered Glass',
+      'Pre-Wired MC4 Connectors & Bypass Diodes',
+      '25-Year Linear Power Output Performance Warranty',
+    ],
+  },
 ];
 
 // Cost Estimator Project Types & Scale Options
@@ -411,6 +471,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModalItem, setActiveModalItem] = useState(null);
+  const [modalActiveImage, setModalActiveImage] = useState(null);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [addedToast, setAddedToast] = useState(null);
 
@@ -777,7 +838,10 @@ export default function HomePage() {
               <div
                 key={item.id}
                 className="mkt-card"
-                onClick={() => setActiveModalItem(item)}
+                onClick={() => {
+                  setActiveModalItem(item);
+                  setModalActiveImage(item.image);
+                }}
               >
                 {/* Discount Badge */}
                 <div className="mkt-discount-badge">{item.discount}</div>
@@ -933,15 +997,32 @@ export default function HomePage() {
             <div className="modal-grid">
               <div className="modal-img-col">
                 <img
-                  src={activeModalItem.image}
+                  src={modalActiveImage || activeModalItem.image}
                   alt={activeModalItem.name}
                   className="modal-product-img"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+                    e.target.src = '/images/solar-all-in-one-ess.jpg';
                   }}
                 />
                 <div className="mkt-discount-badge" style={{ top: '16px', left: '16px' }}>{activeModalItem.discount}</div>
+
+                {/* Interactive Multi-Angle Stock Photo Gallery */}
+                {activeModalItem.gallery && activeModalItem.gallery.length > 1 && (
+                  <div className="modal-gallery-thumbs">
+                    {activeModalItem.gallery.map((imgUrl, gIdx) => (
+                      <button
+                        key={gIdx}
+                        type="button"
+                        className={`modal-thumb-btn ${(modalActiveImage || activeModalItem.image) === imgUrl ? 'active' : ''}`}
+                        onClick={() => setModalActiveImage(imgUrl)}
+                        title={`View image ${gIdx + 1}`}
+                      >
+                        <img src={imgUrl} alt={`Thumbnail ${gIdx + 1}`} />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="modal-info-col">

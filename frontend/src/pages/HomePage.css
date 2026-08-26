@@ -1076,6 +1076,52 @@
   object-fit: cover;
   display: block;
   min-height: 280px;
+  transition: transform 0.3s ease;
+}
+
+.modal-gallery-thumbs {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  background: rgba(15, 27, 76, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  z-index: 5;
+}
+
+.modal-thumb-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.modal-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-thumb-btn.active {
+  border-color: var(--rust);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(242, 160, 36, 0.5);
+}
+
+.modal-thumb-btn:hover:not(.active) {
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .modal-info-col {
