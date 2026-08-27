@@ -129,6 +129,38 @@ export function registerPaymentRoutes(app) {
     res.status(200).json({ received: true });
   });
 
+  // GET /api/payments/verify/:reference — verifies a Paystack transaction directly
+  app.get('/api/payments/verify/:reference', requireAuth, async (req, res) => {
+    const { reference } = req.params;
+    if (PAYMENT_PROVIDER !== 'paystack' || !PAYSTACK_SECRET_KEY) {
+      return res.status(400).json({ error: 'Paystack is not configured on this server.' });
+    }
+
+    try {
+      const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok || !verifyData.status) {
+        return res.status(400).json({ error: verifyData.message || 'Verification failed' });
+      }
+
+      if (verifyData.data.status === 'success') {
+        const snap = await db.collection('payments').where('provider_ref', '==', reference).limit(1).get();
+        if (!snap.empty) {
+          await markPaymentSucceeded(snap.docs[0].id, snap.docs[0].data().order_id);
+          const orderSnap = await db.collection('orders').doc(snap.docs[0].data().order_id).get();
+          return res.json({ ok: true, status: 'succeeded', order: { id: orderSnap.id, ...orderSnap.data() } });
+        }
+      }
+
+      res.json({ ok: true, status: verifyData.data.status });
+    } catch (err) {
+      res.status(502).json({ error: `Verification error: ${err.message}` });
+    }
+  });
+
   // GET /api/admin/payments — staff view of all payments
   app.get('/api/admin/payments', requireAuth, requireRole('staff', 'admin'), async (req, res) => {
     const snap = await db.collection('payments').orderBy('created_at', 'desc').get();

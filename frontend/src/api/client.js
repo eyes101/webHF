@@ -84,6 +84,8 @@ export const api = {
       apiFetch(`/orders/${orderId}/checkout`, { method: 'POST' }),
     simulateSuccess: (paymentId) =>
       apiFetch(`/payments/${paymentId}/simulate-success`, { method: 'POST' }),
+    verify: (reference) =>
+      apiFetch(`/payments/verify/${encodeURIComponent(reference)}`),
   },
   messages: {
     list: (orderId) => apiFetch(`/orders/${orderId}/messages`),

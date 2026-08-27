@@ -1,6 +1,6 @@
 // pages/OrderDetailPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { formatNaira } from '../utils/currency';
@@ -18,23 +18,46 @@ function getStatusStepIndex(status) {
 export default function OrderDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [order, setOrder] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sendingMsg, setSendingMsg] = useState(false);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [justPaidNotice, setJustPaidNotice] = useState(searchParams.get('paid') === '1');
 
-  const loadData = () => {
-    Promise.all([
-      api.orders.get(id),
-      api.messages.list(id).catch(() => ({ messages: [] })),
-    ])
-      .then(([orderRes, messagesRes]) => {
-        setOrder(orderRes.order);
-        setMessages(messagesRes.messages || []);
-      })
-      .catch((err) => console.error('Failed to load order details:', err))
-      .finally(() => setLoading(false));
+  const payRef = searchParams.get('reference') || searchParams.get('trxref');
+
+  const loadData = async () => {
+    try {
+      const [orderRes, messagesRes] = await Promise.all([
+        api.orders.get(id),
+        api.messages.list(id).catch(() => ({ messages: [] })),
+      ]);
+      setOrder(orderRes.order);
+      setMessages(messagesRes.messages || []);
+
+      // If returning with reference from Paystack and order is not yet marked paid
+      if (payRef && orderRes.order && orderRes.order.status !== 'paid') {
+        setVerifyingPayment(true);
+        try {
+          const verifyRes = await api.payments.verify(payRef);
+          if (verifyRes.order) {
+            setOrder(verifyRes.order);
+            setJustPaidNotice(true);
+          }
+        } catch (e) {
+          console.warn('Paystack auto-verify notice:', e);
+        } finally {
+          setVerifyingPayment(false);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load order details:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -103,6 +126,32 @@ export default function OrderDetailPage() {
         <span>/</span>
         <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Order #{order.id.slice(0, 10)}</span>
       </nav>
+
+      {/* Payment Confirmation Banner */}
+      {justPaidNotice && (
+        <div
+          style={{
+            background: 'var(--green-dim)',
+            border: '1.5px solid var(--green)',
+            borderRadius: 'var(--radius-md)',
+            padding: '16px 20px',
+            marginBottom: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+          }}
+        >
+          <div style={{ fontSize: '24px' }}>🎉</div>
+          <div>
+            <div style={{ fontWeight: 800, color: 'var(--green)', fontSize: '15px' }}>
+              Payment Confirmed Successfully!
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--ink)', marginTop: '2px' }}>
+              Your payment has been received and verified. Halfcon operations have registered your dispatch.
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header Info */}
       <div className="card" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
