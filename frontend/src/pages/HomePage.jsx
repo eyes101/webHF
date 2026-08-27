@@ -1,384 +1,10 @@
-// pages/HomePage.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
 import { CONTACTS, whatsappLink } from '../config/contacts';
+import { MARKETPLACE_CATEGORIES, MARKETPLACE_ITEMS } from '../data/products';
 import './HomePage.css';
-
-// Jumia-style categorized marketplace inventory with REAL stock product photography
-const MARKETPLACE_CATEGORIES = [
-  { id: 'all', label: 'All Items & Services', icon: '✨' },
-  { id: 'appliances', label: 'Electrical & Power', icon: '⚡' },
-  { id: 'ac-cooling', label: 'AC & Climate Cooling', icon: '❄️' },
-  { id: 'cleaning', label: 'Industrial & Home Cleaning', icon: '🧹' },
-  { id: 'curtains', label: 'Curtains & Window Blinds', icon: '🪟' },
-  { id: 'interior', label: 'Kitchen & POP Interior', icon: '🔨' },
-  { id: 'plumbing', label: 'Plumbing & Pipes', icon: '🚰' },
-];
-
-const MARKETPLACE_ITEMS = [
-  {
-    id: 'mkt-1',
-    category: 'appliances',
-    name: 'All-in-One ESS 5KVA Hybrid Solar Inverter + Lithium Battery System',
-    image: '/images/solar-all-in-one-ess.jpg',
-    gallery: [
-      '/images/solar-all-in-one-ess.jpg',
-      '/images/demuda-deye-hybrid-inverter.jpg',
-      '/images/solar-panels-monocrystalline.jpg',
-    ],
-    originalPrice_cents: 185000000,
-    price_cents: 148000000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 142,
-    tag: 'Best Seller',
-    unit: 'Complete Kit',
-    desc: 'Heavy-duty All-in-One ESS (5KWh + 5KW / 2.5KWh + 3KW) integrated pure sine-wave hybrid inverter with LiFePO4 lithium battery backup and intelligent energy management.',
-    specs: [
-      'All-in-One ESS Integrated Inverter + Lithium Battery (700x500x140mm)',
-      'Pure Sine Wave 5KW Output / 5KWh Lithium LiFePO4 Storage',
-      'Dual MPPT Solar Charging + Automatic Grid / Generator Transfer',
-      '5-Year Official Warranty + Full Installation Kit Included',
-    ],
-  },
-  {
-    id: 'mkt-2',
-    category: 'appliances',
-    name: 'Industrial Heavy-Duty Cable Extension Reel (50 Meters)',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 4500000,
-    price_cents: 3600000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 98,
-    tag: 'Top Rated',
-    unit: 'Roll',
-    desc: 'Rugged 50-meter heavy-duty cable extension reel with 4 surge-protected universal sockets and thermal safety cut-off.',
-    specs: ['50m Heavy Gauge Copper Cable', '4 Surge Protected Sockets', 'High-Impact Drum with Carry Handle', 'Safety Overload Switch'],
-  },
-  {
-    id: 'mkt-3',
-    category: 'appliances',
-    name: 'Smart Home Electrical Cable & Wiring Fittings Bundle',
-    image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 8500000,
-    price_cents: 6800000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 76,
-    tag: 'Pro Builder',
-    unit: 'Pack',
-    desc: 'Complete building electrical kit: flame-retardant copper cables, modular switches, sockets, and junction boxes.',
-    specs: ['100% Pure Copper Cores', 'Flame-Retardant PVC Insulation', 'Includes 10 Sockets + 10 Switches', 'Certified for Nigerian Grid'],
-  },
-  {
-    id: 'mkt-4',
-    category: 'ac-cooling',
-    name: 'Haisic / Haier 1.5HP Inverter Split Air Conditioner',
-    image: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 42000000,
-    price_cents: 33600000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 110,
-    tag: 'Popular',
-    unit: 'Unit',
-    desc: 'High-efficiency fast-cooling inverter split AC with low-voltage startup, turbo mode, and anti-rust gold fin compressor.',
-    specs: ['1.5 HP Fast Cooling Capacity', 'Up to 60% Energy Saving Inverter', 'Low Voltage Starter (130V-260V)', 'Installation Kit Included'],
-  },
-  {
-    id: 'mkt-5',
-    category: 'ac-cooling',
-    name: 'Outdoor Heavy-Duty AC Compressor Servicing & Recharge',
-    image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 1800000,
-    price_cents: 1440000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 84,
-    tag: 'Service',
-    unit: 'Per Unit',
-    desc: 'Complete AC chemical coil washing, gas pressure leak detection, freon top-up, and electrical condenser optimization.',
-    specs: ['Certified HVAC Technician On-Site', 'Full Chemical Coil & Filter Wash', 'Freon R410A / R22 Pressure Check', '30-Day Service Guarantee'],
-  },
-  {
-    id: 'mkt-6',
-    category: 'cleaning',
-    name: 'High-Rise Facade & Glass Window Rope-Access Cleaning',
-    image: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 25000000,
-    price_cents: 20000000,
-    discount: '20% OFF',
-    rating: 5.0,
-    reviews: 62,
-    tag: 'Industrial',
-    unit: 'Per Building Scope',
-    desc: 'Professional rope-access high-rise window washing, exterior building stain removal, and facade restoration for corporate towers.',
-    specs: ['Certified Rope-Access Technicians', 'Streak-Free Hydro-Washing Solutions', 'Full Safety Rigging & Insurance', 'Alucobond & Glass Restoration'],
-  },
-  {
-    id: 'mkt-7',
-    category: 'cleaning',
-    name: 'Commercial High-Pressure Jet Washer (2200W / 160 Bar)',
-    image: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 11000000,
-    price_cents: 8800000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 95,
-    tag: 'Equipment',
-    unit: 'Machine',
-    desc: 'Heavy-duty 160-bar high pressure washer for car detailing, driveway paving restoration, and compound washing.',
-    specs: ['2200W Induction Motor', '160 Bar Max Pressure', '10m Steel Reinforced High Pressure Hose', 'Foam Cannon Attachment Included'],
-  },
-  {
-    id: 'mkt-8',
-    category: 'cleaning',
-    name: 'Industrial Floor Buffing & Tile Scrubbing Deep Clean',
-    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 12000000,
-    price_cents: 9600000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 130,
-    tag: 'House Care',
-    unit: 'Per 150 sqm',
-    desc: 'Heavy-duty rotary machine floor scrubbing, tile grout descaling, marble crystallisation, and high-gloss polish for homes & offices.',
-    specs: ['Industrial Single-Disc Floor Scrubber', 'Marble & Terrazzo Crystallization', 'Removes 100% Grout Grime & Wax Build-up', 'Eco-Friendly Shine Sealant'],
-  },
-  {
-    id: 'mkt-9',
-    category: 'curtains',
-    name: 'Custom Luxury Drapes & Curtains (Empire, Pleat & Swags)',
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 16000000,
-    price_cents: 12800000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 154,
-    tag: 'Luxury Decor',
-    unit: 'Per Window Set',
-    desc: 'Bespoke interior drapery tailored in Empire, Overlapping Swags, French Pleat, Roller, Sandglass, and Italian styles.',
-    specs: ['Blackout & Sheer Dual Layer Options', 'Heavyweight Jacquard / Velvet Fabrics', 'Includes Track Rail & Motorized Rods', 'Free On-Site Measurement & Fitting'],
-  },
-  {
-    id: 'mkt-10',
-    category: 'curtains',
-    name: 'Modern Motorized & Manual Vertical / Roller Blinds',
-    image: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 7500000,
-    price_cents: 6000000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 89,
-    tag: 'Office & Home',
-    unit: 'Per Window',
-    desc: 'Sleek sunscreen and blackout roller blinds, vertical louvers, and wooden Venetian blinds for contemporary executive spaces.',
-    specs: ['UV & Heat Reflective Fabric', 'Smooth Chain / Remote Control Mechanism', 'Anti-Static Dust Resistant Surface', 'Custom Sized to Exact Window Frame'],
-  },
-  {
-    id: 'mkt-11',
-    category: 'interior',
-    name: 'Modern Modular Kitchen Build-Out with LED Accent Lighting',
-    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 65000000,
-    price_cents: 52000000,
-    discount: '20% OFF',
-    rating: 5.0,
-    reviews: 78,
-    tag: 'Interior Fit-Out',
-    unit: 'Per Project',
-    desc: 'Full contemporary kitchen cabinetry with granite/quartz worktops, soft-close drawers, under-cabinet warm LED strips, and chimney hood.',
-    specs: ['Moisture-Resistant High-Gloss HDF/MDF', 'Solid Quartz or Granite Countertop', 'Built-in Space for Oven & Dishwasher', '3D Architecture Render Prior to Build'],
-  },
-  {
-    id: 'mkt-12',
-    category: 'interior',
-    name: 'Walk-In Closet & Master Wardrobe System',
-    image: 'https://images.unsplash.com/photo-1558997519-83ea9252def8?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 38000000,
-    price_cents: 30400000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 67,
-    tag: 'Custom Joinery',
-    unit: 'Per Room',
-    desc: 'Custom master walk-in wardrobe featuring multi-tier shelving, shoe racks, integrated mirror vanities, and artificial grass/turf accents.',
-    specs: ['Full Floor-to-Ceiling Shelving', 'Integrated LED Motion Sensor Lights', 'Velvet Jewelry Drawers & Hanger Bars', 'Custom Compartments for 100+ Pairs of Shoes'],
-  },
-  {
-    id: 'mkt-13',
-    category: 'interior',
-    name: 'Luxury POP False Ceiling with Recessed Warm Strip Lighting',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 22000000,
-    price_cents: 17600000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 93,
-    tag: 'POP Ceiling',
-    unit: 'Per Living Area',
-    desc: 'Architectural Plaster of Paris (POP) ceiling design with geometric layered profiles, cove lighting slots, and spotlight distribution.',
-    specs: ['Reinforced Gypsum Plaster Framework', 'Dual-Color Warm & White Hidden LED Coves', 'Anti-Sagging Heavy Gauge Hangers', 'Smooth Flawless Screeding & Finish'],
-  },
-  {
-    id: 'mkt-14',
-    category: 'plumbing',
-    name: 'PPR & PVC Plumbing Pipes and Pressure Fittings Bundle',
-    image: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 9500000,
-    price_cents: 7600000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 82,
-    tag: 'Building Supplies',
-    unit: 'Bundle',
-    desc: 'High-pressure PPR hot/cold water distribution pipes, PVC waste conduits, elbows, union joints, and brass gate valves.',
-    specs: ['PN20 High Pressure Rated PPR', 'UV & Corrosion Resistant Material', 'Includes 20 Pipes + 50 Assorted Fittings', 'Guaranteed Leak-Free Thermal Fusion'],
-  },
-  {
-    id: 'mkt-15',
-    category: 'appliances',
-    name: 'Smart 55" 4K Frameless Ultra-HD LED TV with Voice Remote',
-    image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 38000000,
-    price_cents: 30400000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 64,
-    tag: 'New Arrival',
-    unit: 'Unit',
-    desc: 'Ultra-slim 4K UHD smart television with HDR10+, Dolby Audio, built-in Netflix/YouTube, and Bluetooth connectivity.',
-    specs: ['55-Inch 4K Ultra-HD (3840 x 2160)', 'Frameless Bezel-Less Design', 'Dolby Digital Surround Sound', '2-Year Official Manufacturer Warranty'],
-  },
-  {
-    id: 'mkt-16',
-    category: 'appliances',
-    name: 'Industrial 5000VA Digital Automatic Voltage Stabilizer (AVR)',
-    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 8500000,
-    price_cents: 6800000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 112,
-    tag: 'Grid Protection',
-    unit: 'Unit',
-    desc: 'Heavy-duty 5000VA servo-motor voltage stabilizer with digital display and high/low voltage surge cutoff protection.',
-    specs: ['5000VA / 5KVA Capacity', 'Wide Input Range (100V - 260V)', 'Dual Digital Voltage Meters', 'Time-Delay Surge Circuit Breaker'],
-  },
-  {
-    id: 'mkt-17',
-    category: 'plumbing',
-    name: '1.5HP Stainless Steel Deep-Well Submersible Borehole Pump',
-    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 14000000,
-    price_cents: 11200000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 58,
-    tag: 'Water Supply',
-    unit: 'Unit',
-    desc: 'High-lift 1.5HP multi-stage stainless steel borehole water pump with integrated thermal protector and control box.',
-    specs: ['1.5HP Pure Copper Motor', 'Max Head Lift up to 90 Meters', 'Anti-Sand Resistant Impellers', 'Includes Control Switch Box'],
-  },
-  {
-    id: 'mkt-18',
-    category: 'interior',
-    name: 'Premium Weather-Shield Exterior & Interior Acrylic Paint (20L Drum)',
-    image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 6500000,
-    price_cents: 5200000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 91,
-    tag: 'Surface Care',
-    unit: '20L Drum',
-    desc: 'Heavy-duty washable acrylic emulsion paint with anti-fungal, UV-resistant, and weather-proofing properties for walls.',
-    specs: ['20-Litre High Coverage Drum', 'Anti-Fungal & Dirt Resistant Finish', 'Available in Brilliant White & Custom Tints', 'Up to 7 Years Weather Protection'],
-  },
-  {
-    id: 'mkt-19',
-    category: 'ac-cooling',
-    name: '18" High-Speed Solar & AC/DC Rechargeable Standing Fan with Remote',
-    image: 'https://images.unsplash.com/photo-1618941716939-553df3c6c278?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 4800000,
-    price_cents: 3840000,
-    discount: '20% OFF',
-    rating: 4.8,
-    reviews: 145,
-    tag: 'Energy Saver',
-    unit: 'Unit',
-    desc: 'Dual-power rechargeable standing fan with USB mobile charging port, 16V solar panel input, and 12-hour lithium battery life.',
-    specs: ['18-Inch 5-Blade Aerodynamic Design', 'Up to 12 Hours Continuous Run Time', 'Solar Panel Direct Input & USB Port', 'Infrared Wireless Remote Control'],
-  },
-  {
-    id: 'mkt-20',
-    category: 'interior',
-    name: 'Heavy-Duty 4mm Bituminous Torch-On Roof Waterproofing Membrane (10m Roll)',
-    image: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=800&q=80',
-    originalPrice_cents: 5500000,
-    price_cents: 4400000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 73,
-    tag: 'Leak Protection',
-    unit: '10m Roll',
-    desc: 'Industrial-grade 4mm APP modified bitumen roofing membrane with polyester reinforcement for complete concrete slab and parapet waterproofing.',
-    specs: ['4mm Thickness Reinforced Polymer', '10-Meter x 1-Meter Full Roll', 'High Elasticity & Thermal Tolerance', 'Permanently Stops Concrete Slab Leaks'],
-  },
-  {
-    id: 'mkt-21',
-    category: 'appliances',
-    name: 'DEMUDA / Deye 5KW Pure Sine Wave Smart Hybrid Inverter',
-    image: '/images/demuda-deye-hybrid-inverter.jpg',
-    gallery: [
-      '/images/demuda-deye-hybrid-inverter.jpg',
-      '/images/solar-all-in-one-ess.jpg',
-      '/images/solar-panels-monocrystalline.jpg',
-    ],
-    originalPrice_cents: 95000000,
-    price_cents: 76000000,
-    discount: '20% OFF',
-    rating: 4.9,
-    reviews: 87,
-    tag: 'Smart Storage',
-    unit: 'Unit',
-    desc: 'Intelligent high-efficiency hybrid solar energy storage inverter with smart LCD touchscreen, IP65 weather-proof casing, and WiFi cloud monitoring.',
-    specs: [
-      '5KW Pure Sine Wave Output (48V System)',
-      'Intelligent Touch LCD Display with Real-Time Power Flow',
-      'CE / RoHS / EMC Certified Heavy-Duty Engineering',
-      'Compatible with Lead-Acid & LiFePO4 Lithium Batteries',
-    ],
-  },
-  {
-    id: 'mkt-22',
-    category: 'appliances',
-    name: 'Tier-1 High-Efficiency Monocrystalline Solar PV Panels (Pair)',
-    image: '/images/solar-panels-monocrystalline.jpg',
-    gallery: [
-      '/images/solar-panels-monocrystalline.jpg',
-      '/images/solar-all-in-one-ess.jpg',
-      '/images/demuda-deye-hybrid-inverter.jpg',
-    ],
-    originalPrice_cents: 28000000,
-    price_cents: 22400000,
-    discount: '20% OFF',
-    rating: 5.0,
-    reviews: 104,
-    tag: 'High Yield',
-    unit: 'Pair (2 Panels)',
-    desc: 'High-yield Monocrystalline Half-Cut Cell Solar Panels with anti-reflective tempered glass and weather-sealed anodized aluminum framing.',
-    specs: [
-      'High Efficiency Monocrystalline Half-Cut Cell Architecture',
-      'Anti-Reflective Weather-Shield Tempered Glass',
-      'Pre-Wired MC4 Connectors & Bypass Diodes',
-      '25-Year Linear Power Output Performance Warranty',
-    ],
-  },
-];
 
 // Cost Estimator Project Types & Scale Options
 const ESTIMATOR_PROJECTS = [
@@ -838,10 +464,7 @@ export default function HomePage() {
               <div
                 key={item.id}
                 className="mkt-card"
-                onClick={() => {
-                  setActiveModalItem(item);
-                  setModalActiveImage(item.image);
-                }}
+                onClick={() => navigate(`/products/${item.id}`)}
               >
                 {/* Discount Badge */}
                 <div className="mkt-discount-badge">{item.discount}</div>
@@ -855,7 +478,7 @@ export default function HomePage() {
                     className="mkt-product-img"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+                      e.target.src = '/images/solar-all-in-one-ess.jpg';
                     }}
                   />
                   <span className="mkt-tag-chip">{item.tag}</span>
@@ -891,15 +514,26 @@ export default function HomePage() {
                     >
                       + Add to Cart
                     </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-dark"
+                      style={{ fontSize: '11px', padding: '8px 10px', whiteSpace: 'nowrap' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/products/${item.id}`);
+                      }}
+                    >
+                      Details →
+                    </button>
                     <a
                       href={whatsappLink(`Hi Halfcon, I would like to order: ${item.name} at the discounted price of ${formatNaira(item.price_cents)}.`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mkt-btn-wa"
                       onClick={(e) => e.stopPropagation()}
+                      title="Order on WhatsApp"
                     >
                       <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.316 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.818-.981z"/></svg>
-                      Buy on WA
                     </a>
                   </div>
                 </div>
@@ -1063,6 +697,18 @@ export default function HomePage() {
                     }}
                   >
                     Add to Cart ({formatNaira(activeModalItem.price_cents)})
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-dark btn-lg"
+                    onClick={() => {
+                      const pId = activeModalItem.id;
+                      setActiveModalItem(null);
+                      navigate(`/products/${pId}`);
+                    }}
+                  >
+                    Full Page View →
                   </button>
 
                   <a
