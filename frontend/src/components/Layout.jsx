@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { api } from '../api/client';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import ReceptionistChatBot from './ReceptionistChatBot';
+import NetworkAndStateRestorer from './NetworkAndStateRestorer';
 import './Layout.css';
 
 export default function Layout() {
@@ -58,6 +59,9 @@ export default function Layout() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Offline Status & State / Scroll Restorer */}
+      <NetworkAndStateRestorer />
+
       {/* Top Banner for Unverified Email */}
       {user && !isEmailVerified && (
         <div

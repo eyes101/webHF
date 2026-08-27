@@ -1,5 +1,4 @@
-// pages/CheckoutPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,9 +10,9 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [address, setAddress] = useState('');
-  const [scheduledFor, setScheduledFor] = useState('');
-  const [notes, setNotes] = useState('');
+  const [address, setAddress] = useState(() => localStorage.getItem('halfcon_draft_address') || '');
+  const [scheduledFor, setScheduledFor] = useState(() => localStorage.getItem('halfcon_draft_schedule') || '');
+  const [notes, setNotes] = useState(() => localStorage.getItem('halfcon_draft_notes') || '');
   const [loading, setLoading] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
@@ -22,6 +21,18 @@ export default function CheckoutPage() {
   const [paid, setPaid] = useState(false);
   const [orderTotal, setOrderTotal] = useState(0);
   const [redirecting, setRedirecting] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('halfcon_draft_address', address);
+  }, [address]);
+
+  useEffect(() => {
+    localStorage.setItem('halfcon_draft_schedule', scheduledFor);
+  }, [scheduledFor]);
+
+  useEffect(() => {
+    localStorage.setItem('halfcon_draft_notes', notes);
+  }, [notes]);
 
   const startPayment = async (createdOrderId) => {
     try {
@@ -66,6 +77,9 @@ export default function CheckoutPage() {
       setOrderId(res.order.id);
       setOrderTotal(total);
       clear();
+      localStorage.removeItem('halfcon_draft_address');
+      localStorage.removeItem('halfcon_draft_schedule');
+      localStorage.removeItem('halfcon_draft_notes');
     } catch (err) {
       setPayError('Failed to create order: ' + err.message);
       setLoading(false);

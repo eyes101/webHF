@@ -1,0 +1,158 @@
+/* components/NetworkAndStateRestorer.css — Offline Banner & State Restoration */
+
+.network-banner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  padding: 10px 20px;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+.banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.banner-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.banner-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.banner-dismiss {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: inherit;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.banner-dismiss:hover {
+  opacity: 1;
+}
+
+/* Offline Yellow/Amber Style */
+.offline-banner {
+  background: #FEF3C7;
+  color: #92400E;
+  border-bottom: 2px solid #F59E0B;
+}
+
+/* Back Online Green Style */
+.online-banner {
+  background: #DCFCE7;
+  color: #166534;
+  border-bottom: 2px solid #16A34A;
+}
+
+/* Resume Previous Session Floating Pill */
+.resume-session-pill {
+  position: fixed;
+  bottom: 96px;
+  left: 24px;
+  z-index: 1000;
+  background: #0F1B4C;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  padding: 8px 16px 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 10px 25px rgba(15, 27, 76, 0.4);
+  animation: slideUp 0.3s ease-out;
+  max-width: calc(100vw - 48px);
+}
+
+.resume-text {
+  font-size: 13px;
+  color: #E2E8F0;
+}
+
+.resume-text strong {
+  color: #F2A024;
+}
+
+.resume-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resume-btn-go {
+  background: #F2A024;
+  color: #0F1B4C;
+  border: none;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.resume-btn-go:hover {
+  background: #ffffff;
+  transform: scale(1.04);
+}
+
+.resume-btn-close {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.resume-btn-close:hover {
+  color: #ffffff;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .resume-session-pill {
+    bottom: 84px;
+    left: 12px;
+    right: 12px;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+  }
+}
