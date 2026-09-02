@@ -1,9 +1,8 @@
-// components/Layout.jsx
+﻿// components/Layout.jsx — Universal Header, Navigation & Footer (FAMSWORLD Design)
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { api } from '../api/client';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import ReceptionistChatBot from './ReceptionistChatBot';
 import NetworkAndStateRestorer from './NetworkAndStateRestorer';
@@ -15,25 +14,26 @@ export default function Layout() {
   const { items } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [artisansOpen, setArtisansOpen] = useState(false);
-  const [artisans, setArtisans] = useState([]);
-  const [resendStatus, setResendStatus] = useState('');
-  const [atozOpen, setAtozOpen] = useState(false);
-  const [atozTab, setAtozTab] = useState('atoz');
-  const artisansRef = useRef(null);
 
-  const handleArtisansToggle = () => {
-    if (!artisansOpen && artisans.length === 0) {
-      api.artisans.list().then((res) => setArtisans(res.artisans || [])).catch(() => {});
-    }
-    setArtisansOpen((v) => !v);
-  };
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [atozOpen, setAtozOpen] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const shopRef = useRef(null);
+  const servicesRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (artisansRef.current && !artisansRef.current.contains(e.target)) {
-        setArtisansOpen(false);
+      if (shopRef.current && !shopRef.current.contains(e.target)) {
+        setShopDropdownOpen(false);
+      }
+      if (servicesRef.current && !servicesRef.current.contains(e.target)) {
+        setServicesDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -45,318 +45,426 @@ export default function Layout() {
     navigate('/');
   };
 
-  const handleResend = async () => {
-    setResendStatus('Sending...');
-    try {
-      await resendVerificationEmail();
-      setResendStatus('Verification link sent! Check your email inbox & spam folder.');
-    } catch (e) {
-      setResendStatus('Failed to send verification link. Please try again.');
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (newsletterEmail.trim()) {
+      setNewsletterSubscribed(true);
+      setTimeout(() => setNewsletterSubscribed(false), 5000);
+      setNewsletterEmail('');
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (headerSearch.trim()) {
+      navigate(`/shop?q=${encodeURIComponent(headerSearch.trim())}`);
+      setSearchOpen(false);
     }
   };
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/' && !location.search;
-    return location.pathname + location.search === path;
+    return location.pathname.startsWith(path);
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="layout-root">
       {/* Offline Status & State / Scroll Restorer */}
       <NetworkAndStateRestorer />
 
-      {/* Top Banner for Unverified Email */}
-      {user && !isEmailVerified && (
-        <div
-          style={{
-            background: 'var(--rust-dim)',
-            borderBottom: '1px solid #FDE68A',
-            color: '#92400E',
-            padding: '8px 16px',
-            fontSize: '13px',
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <span>
-            Your email address (<strong>{user.email}</strong>) is unverified.
-          </span>
-          <button
-            type="button"
-            onClick={handleResend}
-            style={{
-              background: 'var(--ink)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '2px 8px',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Resend Verification Link
-          </button>
-          {resendStatus && <span style={{ fontWeight: 600, color: 'var(--green)' }}>{resendStatus}</span>}
+      {/* TOP ANNOUNCEMENT BAR (Dark Navy) */}
+      <div className="top-utility-bar">
+        <div className="wrap top-utility-inner">
+          <div className="top-utility-item">
+            <span>🚚</span>
+            <span>Free Lagos Delivery on Orders Over ₦200,000</span>
+          </div>
+          <div className="top-utility-item center-item">
+            <span>🔄</span>
+            <span>100% Escrow Protection &amp; 6-Month Warranty</span>
+          </div>
+          <div className="top-utility-item right-item">
+            <span>🎧</span>
+            <span>24/7 Hotline: <a href="tel:+2348137321877">+234 813 732 1877</a></span>
+          </div>
         </div>
-      )}
+      </div>
 
-      <header className="header">
-        <div className="header-inner">
-          <div className="header-left">
-            <Link to="/" className="logo-link">
-              <img src="/logo.png" alt="Halfcon" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
-              <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '24px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--ink)' }}>
-                HALFCON
-              </span>
+      {/* MAIN NAVBAR (Crisp White) */}
+      <header className="main-header">
+        <div className="wrap header-inner">
+          {/* Brand Logo */}
+          <Link to="/" className="brand-logo-fam">
+            <div className="logo-symbol">
+              <span className="logo-accent-c">⚡</span>
+            </div>
+            <div className="logo-text-block">
+              <span className="brand-name">HALFCON</span>
+              <span className="brand-tagline">QUALITY &amp; TRUST</span>
+            </div>
+          </Link>
+
+          {/* Center Navigation Links */}
+          <nav className="desktop-nav">
+            <Link to="/" className={`nav-item ${isActive('/') ? 'active' : ''}`}>
+              HOME
             </Link>
 
-            <nav className="nav">
-              <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>Home</Link>
-              <Link to="/kitchens" className={isActive('/kitchens') ? 'nav-link active' : 'nav-link'} style={{ color: 'var(--rust)', fontWeight: 700 }}>
-                🍳 Modular Kitchens
-              </Link>
+            {/* Shop Dropdown */}
+            <div className="nav-dropdown-item" ref={shopRef}>
               <button
                 type="button"
-                className="nav-link"
-                onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}
+                className={`nav-item dropdown-btn ${isActive('/shop') || isActive('/products') ? 'active' : ''}`}
+                onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
+                onMouseEnter={() => setShopDropdownOpen(true)}
               >
-                📖 A-Z Appliances
+                SHOP ▾
               </button>
-              <a href="/#marketplace" className="nav-link">Products</a>
-              <Link to="/services" className={location.pathname === '/services' && !location.search ? 'nav-link active' : 'nav-link'}>Services</Link>
-              <Link to="/services?category=Logistics" className={location.search.includes('Logistics') ? 'nav-link active' : 'nav-link'}>Logistics</Link>
-              <Link to="/services?category=Special%20Duties" className={location.search.includes('Special') ? 'nav-link active' : 'nav-link'}>Special Duties</Link>
-              <div className="nav-dropdown" ref={artisansRef}>
-                <button
-                  type="button"
-                  className={`nav-link nav-dropdown-trigger ${isActive('/artisans') ? 'active' : ''}`}
-                  onClick={handleArtisansToggle}
-                  aria-expanded={artisansOpen}
-                >
-                  Artisans
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: artisansOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
-                </button>
-                {artisansOpen && (
-                  <div className="nav-dropdown-panel">
-                    {artisans.length === 0 ? (
-                      <div className="nav-dropdown-empty">No artisans listed yet.</div>
-                    ) : (
-                      <table className="nav-dropdown-table">
-                        <thead>
-                          <tr><th>Name</th><th>Trade</th><th>Services offered</th></tr>
-                        </thead>
-                        <tbody>
-                          {artisans.slice(0, 6).map((a) => (
-                            <tr key={a.id}>
-                              <td>{a.name}</td>
-                              <td>{a.trade}</td>
-                              <td>{(a.services_offered || []).join(', ')}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                    <Link to="/artisans" className="nav-dropdown-viewall" onClick={() => setArtisansOpen(false)}>
-                      View all artisans →
-                    </Link>
-                  </div>
-                )}
-              </div>
-              {(user?.role === 'staff' || user?.role === 'admin') && (
-                <Link to="/staff" className={isActive('/staff') ? 'nav-link active' : 'nav-link'}>
-                  Staff Portal
-                </Link>
+              {shopDropdownOpen && (
+                <div className="mega-dropdown-menu" onMouseLeave={() => setShopDropdownOpen(false)}>
+                  <Link to="/shop" className="dropdown-link" onClick={() => setShopDropdownOpen(false)}>
+                    <strong>All Products Catalog</strong>
+                    <span>Complete inventory of genuine electronics</span>
+                  </Link>
+                  <Link to="/kitchens" className="dropdown-link" onClick={() => setShopDropdownOpen(false)}>
+                    <strong>🍳 Modular Kitchens Suite</strong>
+                    <span>Waterfall islands &amp; built-in appliances</span>
+                  </Link>
+                  <button
+                    type="button"
+                    className="dropdown-link"
+                    onClick={() => { setAtozOpen(true); setShopDropdownOpen(false); }}
+                    style={{ textAlign: 'left', background: 'none', border: 'none', width: '100%', cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    <strong>📖 A-Z Kitchen Appliances Directory</strong>
+                    <span>Air fryers to Yam pounders A-Z guide</span>
+                  </button>
+                  <Link to="/shop?category=appliances" className="dropdown-link" onClick={() => setShopDropdownOpen(false)}>
+                    <strong>🔋 Solar &amp; Inverter Systems</strong>
+                    <span>5KVA ESS &amp; LiFePO4 batteries</span>
+                  </Link>
+                  <Link to="/shop?category=ac-cooling" className="dropdown-link" onClick={() => setShopDropdownOpen(false)}>
+                    <strong>❄️ AC &amp; Climate Cooling</strong>
+                    <span>Inverter split ACs &amp; standing fans</span>
+                  </Link>
+                </div>
               )}
-            </nav>
-          </div>
+            </div>
 
-          <div className="header-right">
-            <Link to="/cart" className="cart-btn" aria-label="Cart">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <Link to="/best-sellers" className={`nav-item ${isActive('/best-sellers') ? 'active' : ''}`}>
+              BEST SELLERS
+            </Link>
+
+            <Link to="/new-arrivals" className={`nav-item ${isActive('/new-arrivals') ? 'active' : ''}`}>
+              NEW ARRIVALS
+            </Link>
+
+            <Link to="/kitchens" className={`nav-item kitchen-highlight ${isActive('/kitchens') ? 'active' : ''}`}>
+              MODULAR KITCHENS
+            </Link>
+
+            {/* Services Dropdown */}
+            <div className="nav-dropdown-item" ref={servicesRef}>
+              <button
+                type="button"
+                className={`nav-item dropdown-btn ${isActive('/services') ? 'active' : ''}`}
+                onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
+                onMouseEnter={() => setServicesDropdownOpen(true)}
+              >
+                SERVICES ▾
+              </button>
+              {servicesDropdownOpen && (
+                <div className="mega-dropdown-menu" onMouseLeave={() => setServicesDropdownOpen(false)}>
+                  <Link to="/services" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>All Property Services</strong>
+                    <span>Escrow-backed certified maintenance</span>
+                  </Link>
+                  <Link to="/services?category=Cleaning" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>🧹 Industrial &amp; Deep Cleaning</strong>
+                    <span>High-rise facade &amp; floor scrubbing</span>
+                  </Link>
+                  <Link to="/services?category=Logistics" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>🚚 Express Logistics</strong>
+                    <span>Same-day dispatch across Lagos &amp; Nigeria</span>
+                  </Link>
+                  <Link to="/services?category=Special%20Duties" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>🛡️ Special Duties</strong>
+                    <span>Site security &amp; property protocols</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link to="/artisans" className={`nav-item ${isActive('/artisans') ? 'active' : ''}`}>
+              ARTISANS
+            </Link>
+
+            <Link to="/about" className={`nav-item ${isActive('/about') ? 'active' : ''}`}>
+              ABOUT US
+            </Link>
+
+            <Link to="/contact" className={`nav-item ${isActive('/contact') ? 'active' : ''}`}>
+              CONTACT US
+            </Link>
+          </nav>
+
+          {/* Right Utility Icons (FAMSWORLD style) */}
+          <div className="header-utility-icons">
+            {/* Search Toggle */}
+            <button
+              type="button"
+              className="icon-action-btn"
+              onClick={() => setSearchOpen(!searchOpen)}
+              aria-label="Search"
+              title="Search Products"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+
+            {/* Account / Profile */}
+            {user ? (
+              <div className="user-icon-menu">
+                <Link to="/orders" className="icon-action-btn" title="My Orders & Profile">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </Link>
+                {(user.role === 'staff' || user.role === 'admin') && (
+                  <Link to="/staff" className="badge-staff-link">Staff</Link>
+                )}
+                <button type="button" onClick={handleLogout} className="logout-mini-btn" title="Logout">✕</button>
+              </div>
+            ) : (
+              <Link to="/login" className="icon-action-btn" aria-label="Account Login" title="Sign In">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </Link>
+            )}
+
+            {/* Wishlist Icon */}
+            <button
+              type="button"
+              className="icon-action-btn"
+              onClick={() => navigate('/shop')}
+              title="Saved Items / Wishlist"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+
+            {/* Cart Icon with Counter */}
+            <Link to="/cart" className="cart-action-btn" aria-label="Cart">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
-              {items.length > 0 && <span className="cart-badge">{items.length}</span>}
+              <span className="cart-counter-fam">{items.length}</span>
             </Link>
 
-            <div className="auth-divider" />
-
-            {user ? (
-              <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="user-name" style={{ fontWeight: 600 }}>
-                  {user.name}
-                  {(user.role === 'admin' || user.role === 'staff') && (
-                    <span style={{ marginLeft: '6px', fontSize: '10px', textTransform: 'uppercase', background: 'var(--ink)', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
-                      {user.role}
-                    </span>
-                  )}
-                </span>
-                {user.role === 'customer' && (
-                  <Link to="/orders" className="btn-ghost">Orders</Link>
-                )}
-                <Link to="/settings" className="btn-ghost">Settings</Link>
-                <button className="btn-ghost" onClick={handleLogout}>Logout</button>
-              </div>
-            ) : (
-              <>
-                <Link to="/login" className="btn-ghost">Log In</Link>
-                <Link to="/register" className="btn-green">Register</Link>
-              </>
-            )}
-
+            {/* Mobile Hamburger Menu Toggle */}
             <button
-              className="menu-toggle"
+              className="mobile-hamburger"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <line x1="3" y1="18" x2="21" y2="18"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
               </svg>
             </button>
           </div>
         </div>
 
+        {/* Quick Search Dropdown Bar */}
+        {searchOpen && (
+          <div className="header-search-bar-expand">
+            <form onSubmit={handleSearchSubmit} className="wrap search-form-expand">
+              <input
+                type="text"
+                placeholder="Search over 500+ kitchen appliances, solar inverters, electrical fittings..."
+                value={headerSearch}
+                onChange={(e) => setHeaderSearch(e.target.value)}
+                autoFocus
+                className="search-expand-input"
+              />
+              <button type="submit" className="search-expand-btn">Search Store</button>
+              <button type="button" className="search-close-btn" onClick={() => setSearchOpen(false)}>✕</button>
+            </form>
+          </div>
+        )}
+
+        {/* Mobile Slide-Out Menu */}
         {menuOpen && (
-          <div className="mobile-menu">
-            <Link to="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
-            <Link to="/kitchens" className="mobile-link" onClick={() => setMenuOpen(false)} style={{ color: 'var(--rust)', fontWeight: 700 }}>
-              🍳 Modular Kitchens Suite
-            </Link>
-            <button
-              type="button"
-              className="mobile-link mobile-btn"
-              onClick={() => { setAtozTab('atoz'); setAtozOpen(true); setMenuOpen(false); }}
-              style={{ color: 'var(--ink)', fontWeight: 600 }}
-            >
-              📖 A-Z Kitchen Appliances Directory
-            </button>
-            <a href="/#marketplace" className="mobile-link" onClick={() => setMenuOpen(false)}>Products &amp; Appliances</a>
-            <Link to="/services" className="mobile-link" onClick={() => setMenuOpen(false)}>All Services</Link>
-            <Link to="/services?category=Logistics" className="mobile-link" onClick={() => setMenuOpen(false)}>Logistics</Link>
-            <Link to="/services?category=Special%20Duties" className="mobile-link" onClick={() => setMenuOpen(false)}>Special Duties</Link>
-            <Link to="/artisans" className="mobile-link" onClick={() => setMenuOpen(false)}>Artisans</Link>
-            <Link to="/cart" className="mobile-link" onClick={() => setMenuOpen(false)}>Cart {items.length > 0 && `(${items.length})`}</Link>
-            {user ? (
-              <>
-                {user.role === 'customer' && <Link to="/orders" className="mobile-link" onClick={() => setMenuOpen(false)}>Orders</Link>}
-                {(user.role === 'staff' || user.role === 'admin') && <Link to="/staff" className="mobile-link" onClick={() => setMenuOpen(false)}>Staff Dashboard</Link>}
-                <Link to="/settings" className="mobile-link" onClick={() => setMenuOpen(false)}>Settings</Link>
-                <button className="mobile-link mobile-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>Logout</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="mobile-link" onClick={() => setMenuOpen(false)}>Log In</Link>
-                <Link to="/register" className="mobile-link mobile-green" onClick={() => setMenuOpen(false)}>Register</Link>
-              </>
-            )}
+          <div className="mobile-nav-drawer">
+            <div className="mobile-nav-links">
+              <Link to="/" className="m-link" onClick={() => setMenuOpen(false)}>Home</Link>
+              <Link to="/shop" className="m-link" onClick={() => setMenuOpen(false)}>Shop All Products</Link>
+              <Link to="/kitchens" className="m-link highlight" onClick={() => setMenuOpen(false)}>🍳 Modular Kitchens Suite</Link>
+              <button
+                type="button"
+                className="m-link m-btn"
+                onClick={() => { setAtozOpen(true); setMenuOpen(false); }}
+              >
+                📖 A-Z Kitchen Appliances Directory
+              </button>
+              <Link to="/best-sellers" className="m-link" onClick={() => setMenuOpen(false)}>🔥 Best Sellers</Link>
+              <Link to="/new-arrivals" className="m-link" onClick={() => setMenuOpen(false)}>✨ New Arrivals</Link>
+              <Link to="/services" className="m-link" onClick={() => setMenuOpen(false)}>Services Hub</Link>
+              <Link to="/artisans" className="m-link" onClick={() => setMenuOpen(false)}>Verified Artisans</Link>
+              <Link to="/about" className="m-link" onClick={() => setMenuOpen(false)}>About Us</Link>
+              <Link to="/contact" className="m-link" onClick={() => setMenuOpen(false)}>Contact &amp; Outlets</Link>
+              <Link to="/track" className="m-link" onClick={() => setMenuOpen(false)}>Track My Order</Link>
+              <Link to="/faq" className="m-link" onClick={() => setMenuOpen(false)}>FAQ &amp; Escrow Help</Link>
+
+              <div className="m-auth-box">
+                {user ? (
+                  <>
+                    <Link to="/orders" className="m-auth-link" onClick={() => setMenuOpen(false)}>My Orders</Link>
+                    {(user.role === 'staff' || user.role === 'admin') && (
+                      <Link to="/staff" className="m-auth-link" onClick={() => setMenuOpen(false)}>Staff Dashboard</Link>
+                    )}
+                    <button className="m-auth-btn" onClick={() => { handleLogout(); setMenuOpen(false); }}>Logout</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="m-auth-link" onClick={() => setMenuOpen(false)}>Log In</Link>
+                    <Link to="/register" className="m-auth-btn-register" onClick={() => setMenuOpen(false)}>Register Account</Link>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </header>
 
-      <main style={{ flex: 1 }}>
+      {/* MAIN ROUTE CONTENT */}
+      <main className="layout-main">
         <Outlet />
       </main>
 
-      <footer className="footer">
-        <div className="footer-inner">
-          <div className="footer-col">
-            <Link to="/" className="footer-logo-link">
-              <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '24px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#fff' }}>
-                HALFCON
-              </span>
-            </Link>
-            <p className="footer-blurb">
-              Nigeria's trusted home care, property maintenance, and electrical &amp; electronics sales company. Delivering excellence across the nation.
+      {/* FAMSWORLD STYLE NEWSLETTER SUBSCRIPTION STRIP */}
+      <section className="newsletter-section-fam">
+        <div className="wrap newsletter-inner">
+          <div className="newsletter-left">
+            <div className="newsletter-icon">✉️</div>
+            <div>
+              <h3 className="newsletter-title">JOIN THE HALFCON FAMILY</h3>
+              <p className="newsletter-sub">
+                Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleNewsletterSubmit} className="newsletter-form-box">
+            {newsletterSubscribed ? (
+              <span className="newsletter-success">🎉 Thank you for subscribing! Check your inbox.</span>
+            ) : (
+              <>
+                <input
+                  type="email"
+                  required
+                  placeholder="Enter your email address"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="newsletter-input"
+                />
+                <button type="submit" className="newsletter-btn">
+                  SUBSCRIBE &gt;
+                </button>
+              </>
+            )}
+          </form>
+        </div>
+      </section>
+
+      {/* FAMSWORLD STYLE COMPREHENSIVE FOOTER */}
+      <footer className="footer-fam">
+        <div className="wrap footer-grid-fam">
+          {/* Col 1: Brand & Socials */}
+          <div className="footer-col-fam brand-col">
+            <div className="footer-logo">
+              <span className="logo-accent-c">⚡</span>
+              <span className="brand-name-footer">HALFCON</span>
+            </div>
+            <p className="footer-blurb-fam">
+              HALFCON delivers quality products and verified artisan property maintenance you can trust, at prices you will love. Your satisfaction is our priority.
             </p>
-            <div className="footer-socials">
-              <a href={CONTACTS.instagramUrl} target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="Instagram">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
-              <a href={CONTACTS.facebookUrl} target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="Facebook">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              </a>
+            <div className="footer-social-icons">
+              <a href={CONTACTS.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">ⓕ</a>
+              <a href={CONTACTS.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">📸</a>
+              <a href={CONTACTS.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">💬</a>
+              <a href={`mailto:${CONTACTS.email}`} aria-label="Email">✉️</a>
             </div>
           </div>
 
-          <div className="footer-col">
-            <div className="footer-heading">Services &amp; Products</div>
-            <Link to="/kitchens" className="footer-link" style={{ color: 'var(--rust)', fontWeight: 600 }}>🍳 Modular Kitchens &amp; Cabinetry</Link>
-            <button
-              type="button"
-              className="footer-link"
-              onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', padding: 0 }}
-            >
-              📖 A-Z Kitchen Appliances Directory
-            </button>
-            <a href="/#marketplace" className="footer-link">Products &amp; Appliances</a>
-            <Link to="/services?category=Electrical" className="footer-link">Electrical &amp; Electronics Sales</Link>
-            <Link to="/services?category=Maintenance" className="footer-link">Home Maintenance &amp; Repairs</Link>
-            <Link to="/services?category=Logistics" className="footer-link">Express Logistics</Link>
-            <Link to="/artisans" className="footer-link">Verified Artisans</Link>
+          {/* Col 2: Shop */}
+          <div className="footer-col-fam">
+            <h4 className="footer-title">SHOP</h4>
+            <ul className="footer-links-list">
+              <li><Link to="/shop">All Products</Link></li>
+              <li><Link to="/kitchens">Modular Kitchens</Link></li>
+              <li><Link to="/best-sellers">Best Sellers</Link></li>
+              <li><Link to="/new-arrivals">New Arrivals</Link></li>
+              <li><Link to="/track">Track Order</Link></li>
+              <li><Link to="/shop?category=appliances">Solar Deals</Link></li>
+            </ul>
           </div>
 
-          <div className="footer-col">
-            <div className="footer-heading">Company</div>
-            <Link to="/" className="footer-link">Home</Link>
-            <Link to="/kitchens" className="footer-link">Modular Kitchens</Link>
-            <Link to="/services" className="footer-link">Catalog</Link>
-            <Link to="/artisans" className="footer-link">Find Artisans</Link>
-            <Link to="/staff/login" className="footer-link" style={{ color: 'var(--rust)', fontWeight: 600 }}>Staff Portal Login</Link>
-            <a href={`mailto:${CONTACTS.email}`} className="footer-link">Contact Support</a>
+          {/* Col 3: Customer Service */}
+          <div className="footer-col-fam">
+            <h4 className="footer-title">CUSTOMER SERVICE</h4>
+            <ul className="footer-links-list">
+              <li><Link to="/contact">Contact Us</Link></li>
+              <li><Link to="/faq">Shipping Policy</Link></li>
+              <li><Link to="/faq">Return &amp; Refund Policy</Link></li>
+              <li><Link to="/faq">FAQ</Link></li>
+              <li><Link to="/track">Live Order Tracker</Link></li>
+            </ul>
           </div>
 
-          <div className="footer-col">
-            <div className="footer-heading">Outlets &amp; Contact</div>
-            <div className="footer-contact-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span><strong>Ikorodu:</strong> {CONTACTS.addressIkorodu}</span>
+          {/* Col 4: About Us */}
+          <div className="footer-col-fam">
+            <h4 className="footer-title">ABOUT US</h4>
+            <ul className="footer-links-list">
+              <li><Link to="/about">About HALFCON</Link></li>
+              <li><Link to="/about">Our Story &amp; Outlets</Link></li>
+              <li><Link to="/artisans">Artisan Standards</Link></li>
+              <li><Link to="/staff/login">Staff Portal</Link></li>
+              <li><Link to="/faq">Terms &amp; Conditions</Link></li>
+            </ul>
+          </div>
+
+          {/* Col 5: We Accept & Currency */}
+          <div className="footer-col-fam payment-col">
+            <h4 className="footer-title">WE ACCEPT</h4>
+            <div className="payment-badges-wrap">
+              <span className="pay-badge visa">VISA</span>
+              <span className="pay-badge mastercard">Mastercard</span>
+              <span className="pay-badge paystack">Paystack</span>
+              <span className="pay-badge bank">Bank Transfer</span>
+              <span className="pay-badge escrow">Escrow</span>
             </div>
-            <div className="footer-contact-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span><strong>Alaba Int'l:</strong> {CONTACTS.addressAlaba}</span>
-            </div>
-            <div className="footer-contact-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.84a16 16 0 0 0 6 6l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <a href={`tel:${CONTACTS.whatsappDisplay}`} className="footer-link">{CONTACTS.whatsappDisplay} / {CONTACTS.phoneSecondary}</a>
-            </div>
-            <div className="footer-contact-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <a href={`mailto:${CONTACTS.email}`} className="footer-link">{CONTACTS.email}</a>
+            <div className="outlet-mini-note">
+              <strong>Showrooms:</strong>
+              <p>Ikorodu &amp; Alaba Int'l Market, Lagos</p>
             </div>
           </div>
         </div>
 
-        <div className="footer-bottom">
-          <div>© 2026 Halfcon — House Care &amp; Electrical Appliances. All rights reserved.</div>
-          <div>
-            <Link to="/kitchens" className="footer-bottom-link">Kitchens</Link>
-            <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
-            <Link to="/services" className="footer-bottom-link">Services</Link>
-            <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
-            <Link to="/artisans" className="footer-bottom-link">Artisans</Link>
+        {/* Bottom Legal Copyright Bar */}
+        <div className="footer-bottom-bar-fam">
+          <div className="wrap footer-bottom-inner">
+            <p>© 2026 HALFCON. Quality &amp; Trust. All Rights Reserved.</p>
+            <div className="currency-selector">
+              <span>Currency: <strong>NGN ₦</strong> (Nigeria)</span>
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* Floating AI Receptionist Chatbot at Screen Edge */}
+      {/* Floating AI Receptionist Chatbot */}
       <ReceptionistChatBot />
 
       {/* Interactive A-Z Appliances & Showroom Directory Modal */}
       <AtoZApplianceDropdown
         isOpen={atozOpen}
         onClose={() => setAtozOpen(false)}
-        initialTab={atozTab}
+        initialTab="atoz"
       />
     </div>
   );

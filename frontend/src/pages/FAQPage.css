@@ -1,0 +1,101 @@
+﻿/* pages/FAQPage.css */
+.faq-page {
+  background: #F8FAFC;
+  padding-bottom: 80px;
+}
+
+.faq-hero {
+  background: linear-gradient(135deg, #0F1B4C 0%, #162460 60%, #0F1B4C 100%);
+  padding: 50px 0;
+  color: #ffffff;
+}
+
+.faq-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.faq-subtitle {
+  font-size: 15px;
+  color: #CBD5E1;
+  max-width: 650px;
+  line-height: 1.5;
+}
+
+.faq-container {
+  margin-top: 40px;
+  max-width: 800px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.faq-item.open {
+  border-color: #FDBA74;
+  box-shadow: 0 4px 15px rgba(242, 160, 36, 0.08);
+}
+
+.faq-question-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.faq-icon {
+  font-size: 20px;
+  font-weight: 800;
+  color: #EA580C;
+}
+
+.faq-answer-panel {
+  padding: 0 20px 20px;
+  font-size: 14px;
+  color: var(--steel);
+  line-height: 1.6;
+}
+
+.faq-help-box {
+  background: #0F1B4C;
+  color: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.faq-help-box h3 {
+  font-size: 20px;
+  color: #FBBF24;
+  margin-bottom: 8px;
+}
+
+.faq-help-box p {
+  font-size: 14px;
+  color: #CBD5E1;
+  margin-bottom: 16px;
+}

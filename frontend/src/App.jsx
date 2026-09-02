@@ -5,6 +5,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
+import ShopPage from './pages/ShopPage';
+import BestSellersPage from './pages/BestSellersPage';
+import NewArrivalsPage from './pages/NewArrivalsPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import FAQPage from './pages/FAQPage';
+import TrackOrderPage from './pages/TrackOrderPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import KitchensPage from './pages/KitchensPage';
 import ServicesPage from './pages/ServicesPage';
@@ -53,6 +60,17 @@ function AppRoutes() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/products" element={<ShopPage />} />
+        <Route path="/best-sellers" element={<BestSellersPage />} />
+        <Route path="/new-arrivals" element={<NewArrivalsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/about-us" element={<Navigate to="/about" replace />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/contact-us" element={<Navigate to="/contact" replace />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/track" element={<TrackOrderPage />} />
+        <Route path="/track-order" element={<Navigate to="/track" replace />} />
         <Route path="/kitchens" element={<KitchensPage />} />
         <Route path="/modular-kitchens" element={<Navigate to="/kitchens" replace />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
