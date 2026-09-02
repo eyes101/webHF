@@ -1253,16 +1253,20 @@
   margin-top: auto;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== UNIVERSAL RESPONSIVE STYLES (MOBILE, TABLET, FOLDABLE, DESKTOP) ===== */
 @media (max-width: 992px) {
   .hero-inner {
     grid-template-columns: 1fr;
-    gap: 40px;
-    padding: 48px 24px 64px;
+    gap: 36px;
+    padding: clamp(36px, 6vw, 56px) clamp(16px, 4vw, 24px) clamp(48px, 8vw, 72px);
   }
 
-  .hero-title {
-    font-size: 46px;
+  .hero-media {
+    width: 100%;
+  }
+
+  .hero-glass-card {
+    max-width: 100%;
   }
 
   .estimator-result-card {
@@ -1280,27 +1284,119 @@
 
   .modal-img-col {
     min-height: 240px;
+    max-height: 320px;
   }
 }
 
-@media (max-width: 600px) {
-  .hero-title {
-    font-size: 36px;
+@media (max-width: 768px) {
+  .proof-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
   }
 
-  .section-title {
-    font-size: 30px;
+  .hero-ctas {
+    flex-direction: column;
+    width: 100%;
   }
 
-  .estimator-box {
-    padding: 32px 20px;
+  .hero-ctas .cta-primary,
+  .hero-ctas .cta-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-track-bar {
+    max-width: 100%;
+  }
+
+  .marketplace-header {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .marketplace-search-box {
     width: 100%;
   }
 
+  .marketplace-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-title {
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 1.1;
+  }
+
+  .section-title {
+    font-size: clamp(24px, 6vw, 32px);
+  }
+
+  .hero-desc {
+    font-size: 14px;
+  }
+
+  .estimator-box {
+    padding: 24px 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .estimator-result-card {
+    padding: 18px 16px;
+  }
+
+  .result-price-current {
+    font-size: 26px;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .result-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .proof-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  .modal-info-col {
+    padding: 20px 16px;
+  }
+
   .modal-actions-row {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-actions-row .btn {
+    width: 100%;
+  }
+
+  .marketplace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-trust {
+    gap: 12px;
+  }
+
+  .trust-item {
+    font-size: 12px;
   }
 }

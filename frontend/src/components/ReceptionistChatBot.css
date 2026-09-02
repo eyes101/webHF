@@ -439,13 +439,14 @@
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
   .reception-bot-wrapper {
-    bottom: 16px;
-    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    right: max(16px, env(safe-area-inset-right, 16px));
   }
 
   .reception-chat-card {
     width: calc(100vw - 32px);
-    height: 500px;
+    max-height: calc(100dvh - 84px);
+    height: 480px;
     border-radius: 16px;
   }
 }
