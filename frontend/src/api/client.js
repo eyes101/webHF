@@ -110,3 +110,7 @@ export const api = {
     payments: () => apiFetch('/admin/payments'),
   },
 };
+
+// Safe utility re-exports
+export { whatsappLink } from '../config/contacts';
+export { formatNaira } from '../utils/currency';

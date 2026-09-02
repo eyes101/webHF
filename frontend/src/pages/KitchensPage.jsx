@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { formatNaira, whatsappLink } from '../api/client';
+import { formatNaira } from '../utils/currency';
+import { whatsappLink } from '../config/contacts';
 import { KITCHEN_SHOWCASE_PROJECTS, ATOZ_APPLIANCES } from '../data/kitchenDirectory';
 import AtoZApplianceDropdown from '../components/AtoZApplianceDropdown';
 import './KitchensPage.css';

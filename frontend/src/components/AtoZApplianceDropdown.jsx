@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ATOZ_APPLIANCES } from '../data/kitchenDirectory';
-import { whatsappLink } from '../api/client';
+import { whatsappLink } from '../config/contacts';
 import './AtoZApplianceDropdown.css';
 
 export default function AtoZApplianceDropdown({ isOpen, onClose, initialTab = 'atoz' }) {
