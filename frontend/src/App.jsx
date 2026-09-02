@@ -6,6 +6,7 @@ import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import KitchensPage from './pages/KitchensPage';
 import ServicesPage from './pages/ServicesPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import ArtisansPage from './pages/ArtisansPage';
@@ -52,6 +53,8 @@ function AppRoutes() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/kitchens" element={<KitchensPage />} />
+        <Route path="/modular-kitchens" element={<Navigate to="/kitchens" replace />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/services/:slug" element={<ServiceDetailPage />} />

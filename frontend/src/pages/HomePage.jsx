@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import { MARKETPLACE_CATEGORIES, MARKETPLACE_ITEMS } from '../data/products';
+import AtoZApplianceDropdown from '../components/AtoZApplianceDropdown';
 import './HomePage.css';
 
 // Cost Estimator Project Types & Scale Options
@@ -109,6 +110,8 @@ export default function HomePage() {
   const [inspectionModalOpen, setInspectionModalOpen] = useState(false);
   const [inspForm, setInspForm] = useState({ name: '', phone: '', address: '', projectType: 'Solar & Inverter Setup', date: '' });
   const [inspSubmitted, setInspSubmitted] = useState(false);
+  const [atozOpen, setAtozOpen] = useState(false);
+  const [atozTab, setAtozTab] = useState('atoz');
 
   const { addItem } = useCart();
   const navigate = useNavigate();
@@ -238,18 +241,33 @@ export default function HomePage() {
             </form>
 
             <div className="hero-trust">
-              <div className="trust-item">
+              <button
+                type="button"
+                className="trust-item trust-item-btn"
+                onClick={() => { setAtozTab('stores'); setAtozOpen(true); }}
+                title="Click to view Ikorodu & Alaba Outlets"
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Ikorodu &amp; Alaba Stores
-              </div>
-              <div className="trust-item">
+                <span>📍 Ikorodu &amp; Alaba Stores ▾</span>
+              </button>
+              <button
+                type="button"
+                className="trust-item trust-item-btn"
+                onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
+                title="Click to browse A-Z Kitchen Appliances & Electronics"
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                100% Genuine Appliances
-              </div>
-              <div className="trust-item">
+                <span>🛡️ 100% Genuine Appliances (A-Z Directory) ▾</span>
+              </button>
+              <button
+                type="button"
+                className="trust-item trust-item-btn"
+                onClick={() => { setAtozTab('dispatch'); setAtozOpen(true); }}
+                title="Click to view Same-Day Dispatch & Warranty terms"
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Same-Day Dispatch
-              </div>
+                <span>⚡ Same-Day Dispatch &amp; Escrow ▾</span>
+              </button>
             </div>
           </div>
 
@@ -261,15 +279,23 @@ export default function HomePage() {
                 <span className="glass-code">CODE: HALFCON20</span>
               </div>
               <h3 className="glass-title">Direct Outlets &amp; Service Hub</h3>
+              
+              {/* Quick Link to Modular Kitchens Suite */}
+              <Link to="/kitchens" className="glass-kitchen-promo-box">
+                <div className="promo-badge-mini">✨ NEW SHOWCASE</div>
+                <div className="promo-kitchen-title">Custom Modular Kitchens &amp; Islands →</div>
+                <div className="promo-kitchen-desc">Real Marble waterfall islands &amp; built-in appliances gallery</div>
+              </Link>
+
               <div className="glass-locations">
-                <div className="glass-loc-item">
+                <div className="glass-loc-item" onClick={() => { setAtozTab('stores'); setAtozOpen(true); }} style={{ cursor: 'pointer' }}>
                   <span className="loc-icon">📍</span>
                   <div>
                     <strong>Ikorodu Warehouse &amp; Hub:</strong>
                     <p>{CONTACTS.addressIkorodu}</p>
                   </div>
                 </div>
-                <div className="glass-loc-item">
+                <div className="glass-loc-item" onClick={() => { setAtozTab('stores'); setAtozOpen(true); }} style={{ cursor: 'pointer' }}>
                   <span className="loc-icon">📍</span>
                   <div>
                     <strong>Alaba Int'l Showroom:</strong>
@@ -444,7 +470,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Category Tabs (Jumia Style) */}
+          {/* Category Tabs (Jumia Style) + A-Z Button */}
           <div className="category-scroll-tabs">
             {MARKETPLACE_CATEGORIES.map((cat) => (
               <button
@@ -457,6 +483,64 @@ export default function HomePage() {
                 <span>{cat.label}</span>
               </button>
             ))}
+            <button
+              type="button"
+              className="category-tab-btn atoz-special-tab-btn"
+              onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
+            >
+              <span className="tab-icon">📖</span>
+              <span>A-Z Appliances Directory</span>
+            </button>
+            <Link
+              to="/kitchens"
+              className="category-tab-btn kitchen-special-tab-btn"
+            >
+              <span className="tab-icon">🍳</span>
+              <span>Modular Kitchens Suite →</span>
+            </Link>
+          </div>
+
+          {/* Dedicated Modular Kitchens Showcase Spotlight Banner */}
+          <div className="home-kitchen-spotlight-card">
+            <div className="spotlight-badge-row">
+              <span className="spotlight-gold-badge">🍳 LUXURY MODULAR KITCHENS</span>
+              <span className="spotlight-discount-badge">20% Promotional Discount Active</span>
+            </div>
+            <div className="spotlight-body-grid">
+              <div className="spotlight-content">
+                <h3>Custom Modular Kitchens &amp; Waterfall Islands</h3>
+                <p>
+                  Fabricated with moisture-shielded marine HDF, Calacatta marble waterfall countertops, 
+                  and integrated built-in appliance towers with convection ovens &amp; silent heat extractors.
+                </p>
+                <div className="spotlight-actions">
+                  <Link to="/kitchens" className="btn btn-solid btn-md">
+                    Open Kitchen Showcase &amp; 3D Gallery →
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn btn-dark btn-md"
+                    onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
+                  >
+                    Browse A-Z Kitchen Appliances
+                  </button>
+                </div>
+              </div>
+              <div className="spotlight-previews-grid">
+                <div className="spotlight-thumb-wrap" onClick={() => navigate('/kitchens')}>
+                  <img src="/kitchens/kitchen-1.webp" alt="Waterfall Island Kitchen" />
+                  <span className="spotlight-overlay-label">Waterfall Island</span>
+                </div>
+                <div className="spotlight-thumb-wrap" onClick={() => navigate('/kitchens')}>
+                  <img src="/kitchens/kitchen-2.jpg" alt="Ambient LED Linear Kitchen" />
+                  <span className="spotlight-overlay-label">Linear Ambient LED</span>
+                </div>
+                <div className="spotlight-thumb-wrap" onClick={() => navigate('/kitchens')}>
+                  <img src="/kitchens/kitchen-3.jpg" alt="Ultra-Modern Black Glass Kitchen" />
+                  <span className="spotlight-overlay-label">Smoked Glass Suite</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Toast Notification */}
@@ -851,6 +935,13 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      {/* Interactive A-Z Kitchen Appliances & Showrooms Directory Modal */}
+      <AtoZApplianceDropdown
+        isOpen={atozOpen}
+        onClose={() => setAtozOpen(false)}
+        initialTab={atozTab}
+      />
     </div>
   );
 }

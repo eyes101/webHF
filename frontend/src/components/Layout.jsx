@@ -7,6 +7,7 @@ import { api } from '../api/client';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import ReceptionistChatBot from './ReceptionistChatBot';
 import NetworkAndStateRestorer from './NetworkAndStateRestorer';
+import AtoZApplianceDropdown from './AtoZApplianceDropdown';
 import './Layout.css';
 
 export default function Layout() {
@@ -18,6 +19,8 @@ export default function Layout() {
   const [artisansOpen, setArtisansOpen] = useState(false);
   const [artisans, setArtisans] = useState([]);
   const [resendStatus, setResendStatus] = useState('');
+  const [atozOpen, setAtozOpen] = useState(false);
+  const [atozTab, setAtozTab] = useState('atoz');
   const artisansRef = useRef(null);
 
   const handleArtisansToggle = () => {
@@ -114,8 +117,19 @@ export default function Layout() {
 
             <nav className="nav">
               <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>Home</Link>
+              <Link to="/kitchens" className={isActive('/kitchens') ? 'nav-link active' : 'nav-link'} style={{ color: 'var(--rust)', fontWeight: 700 }}>
+                🍳 Modular Kitchens
+              </Link>
+              <button
+                type="button"
+                className="nav-link"
+                onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}
+              >
+                📖 A-Z Appliances
+              </button>
               <a href="/#marketplace" className="nav-link">Products</a>
-              <Link to="/services" className={location.pathname === '/services' && !location.search ? 'nav-link active' : 'nav-link'}>All Services</Link>
+              <Link to="/services" className={location.pathname === '/services' && !location.search ? 'nav-link active' : 'nav-link'}>Services</Link>
               <Link to="/services?category=Logistics" className={location.search.includes('Logistics') ? 'nav-link active' : 'nav-link'}>Logistics</Link>
               <Link to="/services?category=Special%20Duties" className={location.search.includes('Special') ? 'nav-link active' : 'nav-link'}>Special Duties</Link>
               <div className="nav-dropdown" ref={artisansRef}>
@@ -215,7 +229,18 @@ export default function Layout() {
         {menuOpen && (
           <div className="mobile-menu">
             <Link to="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
-            <a href="/#marketplace" className="mobile-link" onClick={() => setMenuOpen(false)}>Products</a>
+            <Link to="/kitchens" className="mobile-link" onClick={() => setMenuOpen(false)} style={{ color: 'var(--rust)', fontWeight: 700 }}>
+              🍳 Modular Kitchens Suite
+            </Link>
+            <button
+              type="button"
+              className="mobile-link mobile-btn"
+              onClick={() => { setAtozTab('atoz'); setAtozOpen(true); setMenuOpen(false); }}
+              style={{ color: 'var(--ink)', fontWeight: 600 }}
+            >
+              📖 A-Z Kitchen Appliances Directory
+            </button>
+            <a href="/#marketplace" className="mobile-link" onClick={() => setMenuOpen(false)}>Products &amp; Appliances</a>
             <Link to="/services" className="mobile-link" onClick={() => setMenuOpen(false)}>All Services</Link>
             <Link to="/services?category=Logistics" className="mobile-link" onClick={() => setMenuOpen(false)}>Logistics</Link>
             <Link to="/services?category=Special%20Duties" className="mobile-link" onClick={() => setMenuOpen(false)}>Special Duties</Link>
@@ -265,17 +290,26 @@ export default function Layout() {
 
           <div className="footer-col">
             <div className="footer-heading">Services &amp; Products</div>
+            <Link to="/kitchens" className="footer-link" style={{ color: 'var(--rust)', fontWeight: 600 }}>🍳 Modular Kitchens &amp; Cabinetry</Link>
+            <button
+              type="button"
+              className="footer-link"
+              onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', padding: 0 }}
+            >
+              📖 A-Z Kitchen Appliances Directory
+            </button>
             <a href="/#marketplace" className="footer-link">Products &amp; Appliances</a>
             <Link to="/services?category=Electrical" className="footer-link">Electrical &amp; Electronics Sales</Link>
             <Link to="/services?category=Maintenance" className="footer-link">Home Maintenance &amp; Repairs</Link>
             <Link to="/services?category=Logistics" className="footer-link">Express Logistics</Link>
-            <Link to="/services?category=Special%20Duties" className="footer-link">Special Duties</Link>
             <Link to="/artisans" className="footer-link">Verified Artisans</Link>
           </div>
 
           <div className="footer-col">
             <div className="footer-heading">Company</div>
             <Link to="/" className="footer-link">Home</Link>
+            <Link to="/kitchens" className="footer-link">Modular Kitchens</Link>
             <Link to="/services" className="footer-link">Catalog</Link>
             <Link to="/artisans" className="footer-link">Find Artisans</Link>
             <Link to="/staff/login" className="footer-link" style={{ color: 'var(--rust)', fontWeight: 600 }}>Staff Portal Login</Link>
@@ -306,6 +340,8 @@ export default function Layout() {
         <div className="footer-bottom">
           <div>© 2026 Halfcon — House Care &amp; Electrical Appliances. All rights reserved.</div>
           <div>
+            <Link to="/kitchens" className="footer-bottom-link">Kitchens</Link>
+            <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
             <Link to="/services" className="footer-bottom-link">Services</Link>
             <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
             <Link to="/artisans" className="footer-bottom-link">Artisans</Link>
@@ -315,6 +351,13 @@ export default function Layout() {
 
       {/* Floating AI Receptionist Chatbot at Screen Edge */}
       <ReceptionistChatBot />
+
+      {/* Interactive A-Z Appliances & Showroom Directory Modal */}
+      <AtoZApplianceDropdown
+        isOpen={atozOpen}
+        onClose={() => setAtozOpen(false)}
+        initialTab={atozTab}
+      />
     </div>
   );
 }
