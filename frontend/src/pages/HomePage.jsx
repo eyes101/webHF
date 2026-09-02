@@ -184,25 +184,9 @@ export default function HomePage() {
 
   return (
     <div className="home">
-      {/* ===== TOP PROMO MARQUEE BANNER ===== */}
-      <div className="promo-top-bar">
-        <div className="wrap promo-top-inner">
-          <div className="promo-badge">⚡ 20% DISCOUNT ON ALL SERVICES &amp; APPLIANCES — USE CODE: HALFCON20</div>
-          <div className="promo-addresses">
-            <span>📍 <strong>Ikorodu:</strong> {CONTACTS.addressIkorodu}</span>
-            <span className="promo-sep">|</span>
-            <span>📍 <strong>Alaba Int'l:</strong> {CONTACTS.addressAlaba}</span>
-          </div>
-          <div className="promo-hotline">
-            Hotline: <a href={`tel:${CONTACTS.whatsappDisplay}`}>{CONTACTS.whatsappDisplay}</a>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== HERO SECTION ===== */}
+      {/* ===== HERO SECTION WITH HALFCON BANNER BACKGROUND ===== */}
       <section className="hero-section">
-        <div className="hero-bg-blob hero-bg-blob-1" />
-        <div className="hero-bg-blob hero-bg-blob-2" />
+        <div className="hero-bg-overlay" />
 
         <div className="hero-inner">
           <div className="hero-text">
@@ -255,31 +239,57 @@ export default function HomePage() {
 
             <div className="hero-trust">
               <div className="trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 Ikorodu &amp; Alaba Stores
               </div>
               <div className="trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 100% Genuine Appliances
               </div>
               <div className="trust-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 Same-Day Dispatch
               </div>
             </div>
           </div>
 
-          {/* Hero Banner Showcase */}
+          {/* Hero Highlights Card */}
           <div className="hero-media">
-            <div className="hero-flyer-frame">
-              <img
-                src="/halfcon-banner.png"
-                alt="Halfcon House Care and Appliances"
-                className="hero-flyer-img"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
-              <div className="hero-flyer-ribbon">
-                <span className="ribbon-text">20% OFF ALL ORDERS</span>
+            <div className="hero-glass-card">
+              <div className="glass-card-header">
+                <span className="glass-chip">⚡ 20% PROMO ACTIVE</span>
+                <span className="glass-code">CODE: HALFCON20</span>
+              </div>
+              <h3 className="glass-title">Direct Outlets &amp; Service Hub</h3>
+              <div className="glass-locations">
+                <div className="glass-loc-item">
+                  <span className="loc-icon">📍</span>
+                  <div>
+                    <strong>Ikorodu Warehouse &amp; Hub:</strong>
+                    <p>{CONTACTS.addressIkorodu}</p>
+                  </div>
+                </div>
+                <div className="glass-loc-item">
+                  <span className="loc-icon">📍</span>
+                  <div>
+                    <strong>Alaba Int'l Showroom:</strong>
+                    <p>{CONTACTS.addressAlaba}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="glass-footer">
+                <div className="glass-hotline">
+                  <span>Dispatch Hotline:</span>
+                  <a href={`tel:${CONTACTS.whatsappDisplay}`}>{CONTACTS.whatsappDisplay}</a>
+                </div>
+                <a
+                  href={whatsappLink('Hi Halfcon, I would like to inquire about your services and 20% discount offer.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-wa-btn"
+                >
+                  Chat on WhatsApp
+                </a>
               </div>
             </div>
           </div>
