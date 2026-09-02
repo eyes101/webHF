@@ -251,7 +251,7 @@ export default function ServicesPage() {
                     style={{ fontSize: '12px', width: '100%', background: '#0F1B4C', borderColor: '#0F1B4C' }}
                     onClick={() => setNegotiatePillar(pillar.id)}
                   >
-                    🤝 Hire Artisan &amp; Escrow Task
+                    🤝 Request Artisan &amp; Escrow Task
                   </button>
                 </div>
               </div>
@@ -374,14 +374,16 @@ export default function ServicesPage() {
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={(e) => handleQuickAdd(e, service)}
-                    className={`btn btn-sm ${addedItem === service.id ? 'btn-green' : 'btn-solid'}`}
-                    style={{ padding: '6px 12px', fontSize: '12px' }}
-                  >
-                    {addedItem === service.id ? '✓ Added' : '+ Add'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={(e) => handleQuickAdd(e, service)}
+                      className={`btn btn-sm ${addedItem === service.id ? 'btn-green' : 'btn-solid'}`}
+                      style={{ padding: '6px 14px', fontSize: '12px', fontWeight: 700 }}
+                    >
+                      {addedItem === service.id ? '✓ Requested' : 'Request Now →'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </Link>

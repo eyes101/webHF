@@ -402,7 +402,7 @@ export default function HomePage() {
                     className="btn btn-solid btn-lg"
                     onClick={handleBookEstimate}
                   >
-                    Lock 20% Off &amp; Book Online →
+                    Lock 20% Off &amp; Request Now →
                   </button>
 
                   <a
@@ -706,7 +706,9 @@ export default function HomePage() {
                       setActiveModalItem(null);
                     }}
                   >
-                    Add to Cart ({formatNaira(activeModalItem.price_cents)})
+                    {activeModalItem.tag === 'Service' || activeModalItem.category === 'cleaning'
+                      ? `Request Service (${formatNaira(activeModalItem.price_cents)})`
+                      : `Add to Cart (${formatNaira(activeModalItem.price_cents)})`}
                   </button>
 
                   <button
@@ -718,16 +720,16 @@ export default function HomePage() {
                       navigate(`/products/${pId}`);
                     }}
                   >
-                    Full Page View →
+                    Full Details →
                   </button>
 
                   <a
-                    href={whatsappLink(`Hi Halfcon, I would like to order: ${activeModalItem.name} at ${formatNaira(activeModalItem.price_cents)}.`)}
+                    href={whatsappLink(`Hi Halfcon, I would like to request: ${activeModalItem.name} at ${formatNaira(activeModalItem.price_cents)}.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-green btn-lg"
                   >
-                    WhatsApp Order
+                    {activeModalItem.tag === 'Service' || activeModalItem.category === 'cleaning' ? 'Request on WhatsApp' : 'WhatsApp Order'}
                   </a>
                 </div>
               </div>
