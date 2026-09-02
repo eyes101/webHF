@@ -1,4 +1,4 @@
-﻿// components/Layout.jsx — Universal Header, Navigation & Footer (FAMSWORLD Design)
+// components/Layout.jsx — Universal Header, Navigation & Footer (FAMSWORLD Design)
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -95,13 +95,13 @@ export default function Layout() {
         <div className="wrap header-inner">
           {/* Brand Logo */}
           <Link to="/" className="brand-logo-fam">
-            <div className="logo-symbol">
-              <span className="logo-accent-c">⚡</span>
-            </div>
-            <div className="logo-text-block">
-              <span className="brand-name">HALFCON</span>
-              <span className="brand-tagline">QUALITY &amp; TRUST</span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Halfcon Logo"
+              className="logo-img"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+            <span className="brand-name">HALFCON</span>
           </Link>
 
           {/* Center Navigation Links */}
@@ -378,7 +378,12 @@ export default function Layout() {
           {/* Col 1: Brand & Socials */}
           <div className="footer-col-fam brand-col">
             <div className="footer-logo">
-              <span className="logo-accent-c">⚡</span>
+              <img
+                src="/logo.png"
+                alt="Halfcon Logo"
+                className="logo-img"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
               <span className="brand-name-footer">HALFCON</span>
             </div>
             <p className="footer-blurb-fam">

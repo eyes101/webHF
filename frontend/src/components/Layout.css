@@ -1,4 +1,4 @@
-﻿/* components/Layout.css — Modern E-Commerce Header, Navigation & Footer */
+/* components/Layout.css — Modern E-Commerce Header, Navigation & Footer */
 
 .layout-root {
   min-height: 100vh;
@@ -61,7 +61,7 @@
   gap: 20px;
 }
 
-/* Brand Logo (FAMSWORLD Style with C/Lightning Icon) */
+/* Brand Logo */
 .brand-logo-fam {
   display: flex;
   align-items: center;
@@ -70,42 +70,25 @@
   flex-shrink: 0;
 }
 
-.logo-symbol {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #0F1B4C 0%, #1E3A8A 100%);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(15, 27, 76, 0.2);
+.brand-logo-fam .logo-img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
 }
 
-.logo-accent-c {
-  font-size: 18px;
-  color: #EA580C;
-}
-
-.logo-text-block {
-  display: flex;
-  flex-direction: column;
+.footer-logo .logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
 }
 
 .brand-name {
   font-family: 'Big Shoulders Display', sans-serif;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 900;
   letter-spacing: 0.04em;
   color: #0F1B4C;
   line-height: 1;
-}
-
-.brand-tagline {
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: #EA580C;
-  text-transform: uppercase;
 }
 
 /* Center Desktop Navigation Links */

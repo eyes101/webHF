@@ -1,4 +1,4 @@
-﻿// pages/HomePage.jsx — Redesigned Homepage (FAMSWORLD Ultra-Modern E-Commerce Layout)
+// pages/HomePage.jsx — Redesigned Homepage (FAMSWORLD Ultra-Modern E-Commerce Layout)
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -146,12 +146,12 @@ export default function HomePage() {
             </div>
 
             <h1 className="fam-hero-headline">
-              QUALITY PRODUCTS.<br />
-              <span className="text-orange-fam">TRUSTED BY THOUSANDS.</span>
+              Home Care &amp; Property Maintenance with<br />
+              <span className="text-orange-fam">Electrical &amp; Electronics</span> Sales.
             </h1>
 
             <p className="fam-hero-subtext">
-              Discover a wide range of high-quality appliances, solar inverter systems, and certified property maintenance services carefully selected for your lifestyle.
+              From commercial facade cleaning, custom drapes &amp; modular kitchens to solar inverter installations and vetted artisans across Nigeria.
             </p>
 
             <div className="fam-hero-cta-row">
