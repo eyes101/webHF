@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
 import { CONTACTS, whatsappLink } from '../config/contacts';
 import { MARKETPLACE_CATEGORIES, MARKETPLACE_ITEMS } from '../data/products';
+import { ATOZ_APPLIANCES } from '../data/kitchenDirectory';
 import AtoZApplianceDropdown from '../components/AtoZApplianceDropdown';
 import './HomePage.css';
 
@@ -112,9 +113,22 @@ export default function HomePage() {
   const [inspSubmitted, setInspSubmitted] = useState(false);
   const [atozOpen, setAtozOpen] = useState(false);
   const [atozTab, setAtozTab] = useState('atoz');
+  const [heroDropdownTab, setHeroDropdownTab] = useState(null);
+  const [heroSearch, setHeroSearch] = useState('');
+  const [heroLetter, setHeroLetter] = useState('ALL');
 
   const { addItem } = useCart();
   const navigate = useNavigate();
+
+  const heroLetters = ['ALL', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'];
+  const filteredHeroAppliances = ATOZ_APPLIANCES.filter((item) => {
+    const matchesLetter = heroLetter === 'ALL' || item.letter === heroLetter;
+    const matchesSearch =
+      !heroSearch.trim() ||
+      item.name.toLowerCase().includes(heroSearch.toLowerCase()) ||
+      item.category.toLowerCase().includes(heroSearch.toLowerCase());
+    return matchesLetter && matchesSearch;
+  });
 
   const currentProject = ESTIMATOR_PROJECTS[activeProjectIdx];
   const currentOption = currentProject.options[Math.min(activeOptionIdx, currentProject.options.length - 1)];
@@ -243,32 +257,196 @@ export default function HomePage() {
             <div className="hero-trust">
               <button
                 type="button"
-                className="trust-item trust-item-btn"
-                onClick={() => { setAtozTab('stores'); setAtozOpen(true); }}
-                title="Click to view Ikorodu & Alaba Outlets"
+                className={`trust-item trust-item-btn ${heroDropdownTab === 'stores' ? 'active' : ''}`}
+                onClick={() => setHeroDropdownTab(heroDropdownTab === 'stores' ? null : 'stores')}
+                title="Click to toggle Ikorodu & Alaba Outlets"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>📍 Ikorodu &amp; Alaba Stores ▾</span>
+                <span>📍 Ikorodu &amp; Alaba Stores {heroDropdownTab === 'stores' ? '▲' : '▾'}</span>
               </button>
+
               <button
                 type="button"
-                className="trust-item trust-item-btn"
-                onClick={() => { setAtozTab('atoz'); setAtozOpen(true); }}
-                title="Click to browse A-Z Kitchen Appliances & Electronics"
+                className={`trust-item trust-item-btn ${heroDropdownTab === 'atoz' ? 'active' : ''}`}
+                onClick={() => setHeroDropdownTab(heroDropdownTab === 'atoz' ? null : 'atoz')}
+                title="Click to toggle A-Z Kitchen Appliances & Electronics Directory"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>🛡️ 100% Genuine Appliances (A-Z Directory) ▾</span>
+                <span>🛡️ 100% Genuine Appliances (A-Z Directory) {heroDropdownTab === 'atoz' ? '▲' : '▾'}</span>
               </button>
+
               <button
                 type="button"
-                className="trust-item trust-item-btn"
-                onClick={() => { setAtozTab('dispatch'); setAtozOpen(true); }}
-                title="Click to view Same-Day Dispatch & Warranty terms"
+                className={`trust-item trust-item-btn ${heroDropdownTab === 'dispatch' ? 'active' : ''}`}
+                onClick={() => setHeroDropdownTab(heroDropdownTab === 'dispatch' ? null : 'dispatch')}
+                title="Click to toggle Same-Day Dispatch & Warranty terms"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>⚡ Same-Day Dispatch &amp; Escrow ▾</span>
+                <span>⚡ Same-Day Dispatch &amp; Escrow {heroDropdownTab === 'dispatch' ? '▲' : '▾'}</span>
               </button>
             </div>
+
+            {/* In-Line Expandable Hero Dropdown Directory Panel */}
+            {heroDropdownTab && (
+              <div className="hero-inline-dropdown-panel">
+                <div className="inline-panel-header">
+                  <div className="inline-tabs-row">
+                    <button
+                      type="button"
+                      className={`inline-tab ${heroDropdownTab === 'atoz' ? 'active' : ''}`}
+                      onClick={() => setHeroDropdownTab('atoz')}
+                    >
+                      📖 A-Z Kitchen Appliances ({ATOZ_APPLIANCES.length})
+                    </button>
+                    <button
+                      type="button"
+                      className={`inline-tab ${heroDropdownTab === 'stores' ? 'active' : ''}`}
+                      onClick={() => setHeroDropdownTab('stores')}
+                    >
+                      📍 Showrooms &amp; Hubs
+                    </button>
+                    <button
+                      type="button"
+                      className={`inline-tab ${heroDropdownTab === 'dispatch' ? 'active' : ''}`}
+                      onClick={() => setHeroDropdownTab('dispatch')}
+                    >
+                      ⚡ Same-Day Dispatch &amp; Escrow
+                    </button>
+                    <Link to="/kitchens" className="inline-tab inline-kitchen-link">
+                      🍳 Modular Kitchens Suite →
+                    </Link>
+                  </div>
+                  <div className="inline-header-right">
+                    <button
+                      type="button"
+                      className="inline-fullscreen-btn"
+                      onClick={() => { setAtozTab(heroDropdownTab); setAtozOpen(true); }}
+                      title="Open in Large Modal"
+                    >
+                      Fullscreen ↗
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-close-btn"
+                      onClick={() => setHeroDropdownTab(null)}
+                      title="Close Panel"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tab: A-Z Appliances Directory */}
+                {heroDropdownTab === 'atoz' && (
+                  <div className="inline-tab-content">
+                    {/* Search & Letter Filter */}
+                    <div className="inline-search-bar">
+                      <div className="inline-search-input-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input
+                          type="text"
+                          placeholder="Search appliance (Air fryer, Microwave, Oven, Blender, Extractor, Refrigerator)..."
+                          value={heroSearch}
+                          onChange={(e) => setHeroSearch(e.target.value)}
+                          className="inline-search-input"
+                          autoFocus
+                        />
+                        {heroSearch && (
+                          <button type="button" className="inline-clear-btn" onClick={() => setHeroSearch('')}>✕</button>
+                        )}
+                      </div>
+                      <div className="inline-letters-list">
+                        {heroLetters.map((l) => (
+                          <button
+                            key={l}
+                            type="button"
+                            className={`inline-letter-pill ${heroLetter === l ? 'active' : ''}`}
+                            onClick={() => setHeroLetter(l)}
+                          >
+                            {l}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Appliance Items Grid */}
+                    <div className="inline-appliances-grid">
+                      {filteredHeroAppliances.length === 0 ? (
+                        <div className="inline-empty">
+                          No appliance matching "{heroSearch}". <a href={whatsappLink(`Hi Halfcon, I am looking for appliance: ${heroSearch}`)} target="_blank" rel="noopener noreferrer">Request Quote on WhatsApp →</a>
+                        </div>
+                      ) : (
+                        filteredHeroAppliances.map((item, i) => (
+                          <div key={i} className="inline-appliance-item">
+                            <span className="inline-item-letter">{item.letter}</span>
+                            <div className="inline-item-info">
+                              <div className="inline-item-name">{item.name}</div>
+                              <div className="inline-item-meta">
+                                <span className="inline-item-cat">{item.category}</span> &middot; <strong>{item.price_range}</strong>
+                              </div>
+                            </div>
+                            <a
+                              href={whatsappLink(`Hi Halfcon, I want to purchase / get price for: ${item.name}`)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-item-btn"
+                            >
+                              Quote
+                            </a>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab: Stores */}
+                {heroDropdownTab === 'stores' && (
+                  <div className="inline-tab-content">
+                    <div className="inline-stores-grid">
+                      <div className="inline-store-card">
+                        <span className="inline-badge">Main Dispatch Hub</span>
+                        <h4>📍 Ikorodu Main Hub &amp; Showroom</h4>
+                        <p>{CONTACTS.addressIkorodu}</p>
+                        <div className="inline-store-actions">
+                          <a href="tel:+2348137321877" className="btn btn-solid btn-sm">📞 +234 813 732 1877</a>
+                          <a href={whatsappLink('Hi Halfcon Ikorodu, I want to visit showroom')} target="_blank" rel="noopener noreferrer" className="btn btn-green btn-sm">WhatsApp Ikorodu</a>
+                        </div>
+                      </div>
+                      <div className="inline-store-card">
+                        <span className="inline-badge blue">Commercial Center</span>
+                        <h4>📍 Alaba Int'l Electronics Center</h4>
+                        <p>{CONTACTS.addressAlaba}</p>
+                        <div className="inline-store-actions">
+                          <a href="tel:+2347041003623" className="btn btn-solid btn-sm">📞 +234 704 100 3623</a>
+                          <a href={whatsappLink('Hi Halfcon Alaba, I want to inquire about stock')} target="_blank" rel="noopener noreferrer" className="btn btn-green btn-sm">WhatsApp Alaba</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab: Dispatch & Warranty */}
+                {heroDropdownTab === 'dispatch' && (
+                  <div className="inline-tab-content">
+                    <div className="inline-warranty-grid">
+                      <div className="inline-w-box">
+                        <strong>⚡ Same-Day Delivery in Lagos</strong>
+                        <p>Orders confirmed by 2:00 PM dispatched same-day with live tracking across Lagos Island &amp; Mainland.</p>
+                      </div>
+                      <div className="inline-w-box">
+                        <strong>🛡️ 100% Genuine Direct Warranty</strong>
+                        <p>OEM manufacturer sealed units, official warranty cards, and 7-day instant replacement.</p>
+                      </div>
+                      <div className="inline-w-box">
+                        <strong>🔒 Escrow Payment Protection</strong>
+                        <p>Funds held securely until your artisan or technician completes and tests your installation on-site.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Hero Highlights Card */}

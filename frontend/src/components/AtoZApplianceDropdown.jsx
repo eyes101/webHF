@@ -1,5 +1,5 @@
 // components/AtoZApplianceDropdown.jsx — Interactive A-Z Appliances & Showroom Directory Modal/Drawer
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ATOZ_APPLIANCES } from '../data/kitchenDirectory';
 import { whatsappLink } from '../api/client';
@@ -9,6 +9,12 @@ export default function AtoZApplianceDropdown({ isOpen, onClose, initialTab = 'a
   const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('ALL');
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab, isOpen]);
 
   // Available unique letters in dataset
   const letters = useMemo(() => {
