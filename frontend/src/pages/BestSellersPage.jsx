@@ -1,4 +1,4 @@
-﻿// pages/BestSellersPage.jsx — Top Rated Appliances & Bestsellers
+// pages/BestSellersPage.jsx — Top Rated Appliances & Bestsellers
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -40,7 +40,15 @@ export default function BestSellersPage() {
             <span>/</span>
             <strong>Best Sellers</strong>
           </div>
-          <h1 className="shop-hero-title">🔥 Halfcon Best Sellers</h1>
+          <h1 className="shop-hero-title" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <img
+              src="/logo.png"
+              alt="Halfcon Logo"
+              style={{ height: '42px', width: 'auto', objectFit: 'contain', background: 'rgba(255, 255, 255, 0.95)', padding: '4px 10px', borderRadius: '8px' }}
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+            <span>Halfcon Best Sellers</span>
+          </h1>
           <p className="shop-hero-desc">
             The most popular solar systems, built-in kitchen ovens, and high-demand maintenance packages trusted by Nigerian homes.
           </p>

@@ -46,9 +46,9 @@ export const MARKETPLACE_ITEMS = [
     category: 'appliances',
     categoryLabel: 'Electrical & Power',
     name: 'Industrial Heavy-Duty Cable Extension Reel (50 Meters)',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+    image: '/images/cable-extension-reel.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+      '/images/cable-extension-reel.jpg',
       'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
     ],
     originalPrice_cents: 4500000,

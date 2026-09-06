@@ -302,7 +302,7 @@ export default function Layout() {
               >
                 📖 A-Z Kitchen Appliances Directory
               </button>
-              <Link to="/best-sellers" className="m-link" onClick={() => setMenuOpen(false)}>🔥 Best Sellers</Link>
+              <Link to="/best-sellers" className="m-link" onClick={() => setMenuOpen(false)}>Best Sellers</Link>
               <Link to="/new-arrivals" className="m-link" onClick={() => setMenuOpen(false)}>✨ New Arrivals</Link>
               <Link to="/services" className="m-link" onClick={() => setMenuOpen(false)}>Services Hub</Link>
               <Link to="/artisans" className="m-link" onClick={() => setMenuOpen(false)}>Verified Artisans</Link>
