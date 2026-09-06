@@ -1,11 +1,12 @@
 // public/sw.js — Halfcon Offline & Performance Service Worker
-const CACHE_NAME = 'halfcon-v2';
+const CACHE_NAME = 'halfcon-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/logo.png',
   '/halfcon-banner.png',
   '/hero.png',
+  '/images/cable-extension-reel.jpg',
   '/images/solar-all-in-one-ess.jpg',
   '/images/demuda-deye-hybrid-inverter.jpg',
   '/images/solar-panels-monocrystalline.jpg',

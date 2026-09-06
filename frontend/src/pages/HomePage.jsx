@@ -330,8 +330,14 @@ export default function HomePage() {
       <section className="fam-bestsellers-section">
         <div className="wrap">
           <div className="fam-section-header-between">
-            <h2 className="fam-section-title-left">
-              BEST <span className="text-orange-fam">SELLERS</span>
+            <h2 className="fam-section-title-left" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img
+                src="/logo.png"
+                alt="Halfcon Logo"
+                style={{ height: '34px', width: 'auto', objectFit: 'contain' }}
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+              <span>HALFCON <span className="text-orange-fam">BEST SELLERS</span></span>
             </h2>
             <Link to="/best-sellers" className="view-all-link-fam">
               VIEW ALL
