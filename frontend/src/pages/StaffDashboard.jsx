@@ -1,5 +1,6 @@
 // pages/StaffDashboard.jsx
 import React, { useEffect, useState } from 'react';
+import { showToast } from '../components/Toast';
 import { api } from '../api/client';
 import { formatNaira } from '../utils/currency';
 
@@ -73,7 +74,7 @@ function OrdersTab() {
       await api.orders.updateStatus(orderId, newStatus);
       load();
     } catch (err) {
-      alert('Error updating status: ' + err.message);
+      showToast('Error updating status: ' + err.message);
     }
   };
 
@@ -187,7 +188,7 @@ function ServicesTab() {
       setShowForm(false);
       load();
     } catch (err) {
-      alert('Error creating service: ' + err.message);
+      showToast('Error creating service: ' + err.message);
     }
   };
 
@@ -196,7 +197,7 @@ function ServicesTab() {
       await api.services.adminUpdate(service.id, { active: service.active ? 0 : 1 });
       load();
     } catch (err) {
-      alert('Error updating service: ' + err.message);
+      showToast('Error updating service: ' + err.message);
     }
   };
 
@@ -306,7 +307,7 @@ function ArtisansTab() {
       setShowForm(false);
       load();
     } catch (err) {
-      alert('Error creating artisan: ' + err.message);
+      showToast('Error creating artisan: ' + err.message);
     }
   };
 
@@ -315,7 +316,7 @@ function ArtisansTab() {
       await api.artisans.adminUpdate(artisan.id, { active: !artisan.active });
       load();
     } catch (err) {
-      alert('Error updating artisan: ' + err.message);
+      showToast('Error updating artisan: ' + err.message);
     }
   };
 
@@ -464,7 +465,7 @@ function UsersTab() {
       setTimeout(() => setStatusMsg(''), 3000);
       load();
     } catch (err) {
-      alert('Failed to update role: ' + err.message);
+      showToast('Failed to update role: ' + err.message);
     }
   };
 
@@ -479,7 +480,7 @@ function UsersTab() {
       setTimeout(() => setStatusMsg(''), 4000);
       load();
     } catch (err) {
-      alert('Error inviting staff: ' + err.message);
+      showToast('Error inviting staff: ' + err.message);
     }
   };
 

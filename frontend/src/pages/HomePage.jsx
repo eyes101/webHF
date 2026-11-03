@@ -1,5 +1,6 @@
 // pages/HomePage.jsx — Redesigned Homepage (FAMSWORLD Ultra-Modern E-Commerce Layout)
 import React, { useState } from 'react';
+import { showToast } from '../components/Toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
@@ -357,7 +358,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     className="fam-wishlist-btn"
-                    onClick={(e) => { e.stopPropagation(); alert(`Added ${item.name} to wishlist!`); }}
+                    onClick={(e) => { e.stopPropagation(); showToast(`Added ${item.name} to wishlist!`); }}
                   >
                     ♡
                   </button>

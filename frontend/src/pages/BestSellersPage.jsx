@@ -1,5 +1,6 @@
 // pages/BestSellersPage.jsx — Top Rated Appliances & Bestsellers
 import React, { useState } from 'react';
+import { showToast } from '../components/Toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { MARKETPLACE_ITEMS } from '../data/products';
@@ -77,7 +78,7 @@ export default function BestSellersPage() {
                 <button
                   type="button"
                   className="wishlist-btn"
-                  onClick={(e) => { e.stopPropagation(); alert(`Added ${item.name} to wishlist!`); }}
+                  onClick={(e) => { e.stopPropagation(); showToast(`Added ${item.name} to wishlist!`); }}
                 >
                   ♡
                 </button>
