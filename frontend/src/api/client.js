@@ -162,6 +162,35 @@ export const api = {
       return { order: orderData };
     },
 
+    // Public guest tracking: no login required. Falls back to orders saved
+    // on this device (created via the resilient local path) when the API
+    // has no record.
+    track: async (id) => {
+      const clean = (id || '').trim();
+      try {
+        const res = await apiFetch(`/orders/track/${encodeURIComponent(clean)}`);
+        if (res.tracking) return res;
+      } catch (err) {
+        // fall through to the local copy
+      }
+      const local = getLocalOrders().find((o) => o.id === clean);
+      if (local) {
+        return {
+          tracking: {
+            id: local.id,
+            status: local.status,
+            created_at: typeof local.created_at === 'string' ? local.created_at : null,
+            updated_at: typeof local.updated_at === 'string' ? local.updated_at : null,
+            items: (local.items || []).map((i) => ({
+              service_name: i.service_name,
+              quantity: i.quantity,
+            })),
+          },
+        };
+      }
+      throw new Error('Order not found. Please check the ID and try again.');
+    },
+
     list: async (status, page = 1, limit = 20) => {
       try {
         const params = new URLSearchParams({ page, limit });
