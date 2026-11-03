@@ -1,5 +1,6 @@
 // pages/OrderDetailPage.jsx
 import React, { useEffect, useState } from 'react';
+import { showToast } from '../components/Toast';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -79,7 +80,7 @@ export default function OrderDetailPage() {
       const res = await api.messages.list(id);
       setMessages(res.messages || []);
     } catch (err) {
-      alert('Error sending message: ' + (err.message || 'Please try again.'));
+      showToast('Error sending message: ' + (err.message || 'Please try again.'));
     } finally {
       setSendingMsg(false);
     }
