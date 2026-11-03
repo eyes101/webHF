@@ -79,6 +79,9 @@ export default function ServicesPage() {
   const [negotiatePillar, setNegotiatePillar] = useState(null);
   const { addItem } = useCart();
   const [addedItem, setAddedItem] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Fetch full catalog once to capture all distinct categories
   useEffect(() => {
@@ -91,15 +94,20 @@ export default function ServicesPage() {
       .catch((err) => console.error('Failed to load categories:', err));
   }, []);
 
-  // Fetch filtered or full list when activeCategory changes
+  // Fetch filtered or full list when activeCategory changes (or on retry)
   useEffect(() => {
     setLoading(true);
+    setLoadError(false);
     api.services
       .list(activeCategory)
       .then((res) => setServices(res.services || []))
-      .catch((err) => console.error('Failed to load services:', err))
+      .catch((err) => {
+        console.error('Failed to load services:', err);
+        setServices([]);
+        setLoadError(true);
+      })
       .finally(() => setLoading(false));
-  }, [activeCategory]);
+  }, [activeCategory, retryCount]);
 
   const handleCategorySelect = (cat) => {
     const next = new URLSearchParams(searchParams);
@@ -134,6 +142,14 @@ export default function ServicesPage() {
       default:
         return 0; // Keep the API order: category, then name
     }
+  });
+
+  const visibleServices = sortedServices.filter((service) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return [service.name, service.description, service.category]
+      .filter(Boolean)
+      .some((field) => field.toLowerCase().includes(q));
   });
 
   const handleQuickAdd = (e, service) => {
@@ -182,6 +198,34 @@ export default function ServicesPage() {
         <p style={{ color: 'var(--steel)', fontSize: '16px', lineHeight: 1.6 }}>
           Professional home maintenance, technician repairs, genuine electrical &amp; electronics supplies, and express logistics across Nigeria.
         </p>
+      </div>
+
+      {/* Search */}
+      <div style={{ marginBottom: '32px', maxWidth: '560px' }}>
+        <label htmlFor="services-search" style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--ink)', marginBottom: '8px' }}>
+          Search services
+        </label>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input
+            id="services-search"
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="e.g. solar inverter, leak detection, painting…"
+            style={{ flex: 1, padding: '12px 16px', fontSize: '14px', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', color: 'var(--ink)', background: '#ffffff' }}
+          />
+          {searchQuery && (
+            <button type="button" className="btn btn-sm" onClick={() => setSearchQuery('')}>
+              Clear ✕
+            </button>
+          )}
+        </div>
+        {searchQuery && !loading && !loadError && (
+          <p style={{ fontSize: '13px', color: 'var(--steel)', marginTop: '8px' }}>
+            {visibleServices.length} of {services.length} services match “{searchQuery}”
+            {activeCategory ? ` in ${activeCategory}` : ''}
+          </p>
+        )}
       </div>
 
       {/* 4-COLUMN HOME MAINTENANCE & REPAIR PILLARS WITH P2P ARTISAN HIRING */}
@@ -329,10 +373,34 @@ export default function ServicesPage() {
       </div>
 
       {/* Services Grid */}
-      {loading ? (
+      {loadError ? (
+        <div className="card" style={{ padding: '60px 24px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--steel)', marginBottom: '16px' }}>
+            We couldn’t load the services catalog. Please check your connection and try again.
+          </p>
+          <button
+            type="button"
+            className="btn btn-sm btn-solid"
+            onClick={() => setRetryCount((c) => c + 1)}
+          >
+            Retry
+          </button>
+        </div>
+      ) : loading ? (
         <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--steel)' }}>
           <div className="spinner" style={{ margin: '0 auto 16px' }} />
           Loading services...
+        </div>
+      ) : visibleServices.length === 0 && searchQuery.trim() ? (
+        <div className="card" style={{ padding: '60px 24px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--steel)', marginBottom: '16px' }}>No services match “{searchQuery}”{activeCategory ? ` in ${activeCategory}` : ''}. Try a different search, or view everything.</p>
+          <button
+            type="button"
+            className="btn btn-sm btn-solid"
+            onClick={() => { setSearchQuery(''); handleCategorySelect(''); }}
+          >
+            View All Services
+          </button>
         </div>
       ) : services.length === 0 ? (
         <div className="card" style={{ padding: '60px 24px', textAlign: 'center' }}>
@@ -347,7 +415,7 @@ export default function ServicesPage() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-          {sortedServices.map((service) => (
+          {visibleServices.map((service) => (
             <Link
               key={service.id}
               to={`/services/${service.slug}`}
