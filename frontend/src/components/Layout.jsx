@@ -415,8 +415,8 @@ export default function Layout() {
             <h4 className="footer-title">CUSTOMER SERVICE</h4>
             <ul className="footer-links-list">
               <li><Link to="/contact">Contact Us</Link></li>
-              <li><Link to="/faq">Shipping Policy</Link></li>
-              <li><Link to="/faq">Return &amp; Refund Policy</Link></li>
+              <li><Link to="/shipping-policy">Shipping Policy</Link></li>
+              <li><Link to="/returns-policy">Returns &amp; Refund Policy</Link></li>
               <li><Link to="/faq">FAQ</Link></li>
               <li><Link to="/track">Live Order Tracker</Link></li>
             </ul>
@@ -430,7 +430,7 @@ export default function Layout() {
               <li><Link to="/about">Our Story &amp; Outlets</Link></li>
               <li><Link to="/artisans">Artisan Standards</Link></li>
               <li><Link to="/staff/login">Staff Portal</Link></li>
-              <li><Link to="/faq">Terms &amp; Conditions</Link></li>
+              <li><Link to="/terms">Terms &amp; Conditions</Link></li>
             </ul>
           </div>
 
