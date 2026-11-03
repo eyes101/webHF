@@ -93,12 +93,12 @@ export const api = {
       apiFetch(`/admin/artisans/${id}`, { method: 'DELETE' }),
   },
   orders: {
-    create: async (items, notes, address, scheduled_for) => {
+    create: async (items, notes, address, scheduled_for, promo_code) => {
       // 1. Try Cloud Functions API
       try {
         const res = await apiFetch('/orders', {
           method: 'POST',
-          body: JSON.stringify({ items, notes, address, scheduled_for }),
+          body: JSON.stringify({ items, notes, address, scheduled_for, promo_code: promo_code || null }),
         });
         if (res.order) {
           saveLocalOrder(res.order);
@@ -128,12 +128,21 @@ export const api = {
         };
       });
 
+      // Fallback path mirrors the server's promo handling so the
+      // discounted total is consistent if the API is unreachable.
+      const PROMO_CODES = { HALFCON20: 20 };
+      const promoPercent = promo_code ? PROMO_CODES[String(promo_code).trim().toUpperCase()] || 0 : 0;
+      const discountCents = promoPercent ? Math.round((totalCents * promoPercent) / 100) : 0;
+
       const orderData = {
         id: orderId,
         user_id: user ? user.uid : 'guest',
         user_email: user ? user.email : '',
         status: 'pending',
-        total_cents: totalCents,
+        subtotal_cents: totalCents,
+        discount_cents: discountCents,
+        promo_code: promoPercent ? String(promo_code).trim().toUpperCase() : null,
+        total_cents: totalCents - discountCents,
         currency: 'NGN',
         notes: notes || null,
         address: address || null,
