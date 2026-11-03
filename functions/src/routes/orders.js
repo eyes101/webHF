@@ -4,10 +4,14 @@ import { requireAuth, requireRole } from '../middleware/requireAuth.js';
 
 const VALID_STATUSES = ['pending', 'awaiting_payment', 'paid', 'in_progress', 'completed', 'cancelled'];
 
+// Promo codes are validated here, on the server — the totals stored on the
+// order (and charged at payment) always use these values, never the client's.
+const PROMO_CODES = { HALFCON20: 20 };
+
 export function registerOrderRoutes(app) {
   // POST /api/orders — customer creates an order (cart of service / product line items)
   app.post('/api/orders', requireAuth, async (req, res) => {
-    const { items, notes, address, scheduled_for } = req.body;
+    const { items, notes, address, scheduled_for, promo_code } = req.body;
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'items must be a non-empty array of items' });
     }
@@ -52,11 +56,28 @@ export function registerOrderRoutes(app) {
       });
     }
 
+    // Apply promo code (server-validated)
+    const subtotalCents = totalCents;
+    let discountCents = 0;
+    let appliedPromo = null;
+    if (promo_code) {
+      const normalized = String(promo_code).trim().toUpperCase();
+      const percent = PROMO_CODES[normalized];
+      if (!percent) {
+        return res.status(400).json({ error: 'Invalid promo code' });
+      }
+      appliedPromo = normalized;
+      discountCents = Math.round((subtotalCents * percent) / 100);
+    }
+
     const ref = db.collection('orders').doc();
     const order = {
       user_id: req.user.id,
       status: 'pending',
-      total_cents: totalCents,
+      subtotal_cents: subtotalCents,
+      discount_cents: discountCents,
+      promo_code: appliedPromo,
+      total_cents: subtotalCents - discountCents,
       currency: 'NGN',
       notes: notes || null,
       address: address || null,
