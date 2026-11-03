@@ -68,21 +68,18 @@ const TESTIMONIALS = [
     quote: "Amazing quality and fast same-day dispatch to Lekki! The 5KVA All-in-One Solar Inverter works flawlessly and powers our whole apartment with zero noise.",
     name: "Dr. Babatunde Adeleke",
     role: "Verified Buyer · Lekki Phase 1",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
     rating: 5,
   },
   {
     quote: "HALFCON has become our go-to for all property fittings. Their modular waterfall kitchen fabrication is top-notch, and the 100% escrow protection gives complete peace of mind.",
     name: "Amina Yusuf",
     role: "Verified Client · Victoria Island",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80",
     rating: 5,
   },
   {
     quote: "Excellent customer service and genuine appliances with original warranty cards. The live test bench at their Alaba showroom gave me total confidence.",
     name: "Chukwuma Eze",
     role: "Verified Buyer · Ikeja GRA",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80",
     rating: 5,
   },
 ];
@@ -492,7 +489,6 @@ export default function HomePage() {
                 <div className="test-stars">★★★★★</div>
                 <p className="test-quote-text">{t.quote}</p>
                 <div className="test-author-row">
-                  <img src={t.avatar} alt={t.name} className="test-avatar" />
                   <div>
                     <strong className="test-author-name">{t.name}</strong>
                     <span className="test-author-role">{t.role}</span>
