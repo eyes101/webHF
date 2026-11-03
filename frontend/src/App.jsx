@@ -15,6 +15,7 @@ import TrackOrderPage from './pages/TrackOrderPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import KitchensPage from './pages/KitchensPage';
 import ServicesPage from './pages/ServicesPage';
+import ServiceFinderPage from './pages/ServiceFinderPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import ArtisansPage from './pages/ArtisansPage';
 import CartPage from './pages/CartPage';
@@ -75,6 +76,7 @@ function AppRoutes() {
         <Route path="/modular-kitchens" element={<Navigate to="/kitchens" replace />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route path="/service-finder" element={<ServiceFinderPage />} />
         <Route path="/services/:slug" element={<ServiceDetailPage />} />
         <Route path="/artisans" element={<ArtisansPage />} />
         <Route path="/cart" element={<CartPage />} />
