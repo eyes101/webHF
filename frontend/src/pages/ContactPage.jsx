@@ -62,8 +62,9 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-row-2col">
                   <div>
-                    <label className="field-label">Full Name *</label>
+                    <label className="field-label" htmlFor="contact-name">Full Name *</label>
                     <input
+                      id="contact-name"
                       type="text"
                       className="input"
                       required
@@ -73,8 +74,9 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="field-label">Phone / WhatsApp Number *</label>
+                    <label className="field-label" htmlFor="contact-phone">Phone / WhatsApp Number *</label>
                     <input
+                      id="contact-phone"
                       type="tel"
                       className="input"
                       required
@@ -87,8 +89,9 @@ export default function ContactPage() {
 
                 <div className="form-row-2col">
                   <div>
-                    <label className="field-label">Email Address</label>
+                    <label className="field-label" htmlFor="contact-email">Email Address</label>
                     <input
+                      id="contact-email"
                       type="email"
                       className="input"
                       placeholder="e.g. adeleke@example.com"
@@ -97,8 +100,9 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="field-label">Subject Category *</label>
+                    <label className="field-label" htmlFor="contact-subject">Subject Category *</label>
                     <select
+                      id="contact-subject"
                       className="input"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -114,8 +118,9 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="field-label">Your Message / Project Details *</label>
+                  <label className="field-label" htmlFor="contact-message">Your Message / Project Details *</label>
                   <textarea
+                    id="contact-message"
                     className="input"
                     required
                     rows="4"
