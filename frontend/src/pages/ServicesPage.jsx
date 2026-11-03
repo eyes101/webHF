@@ -440,6 +440,19 @@ export default function ServicesPage() {
         </div>
       )}
 
+      {/* Guided finder CTA */}
+      <div style={{ marginTop: '48px', background: 'linear-gradient(135deg, #FFF8F3 0%, #FDF0EC 100%)', border: '1px solid #F3D8CC', borderRadius: '16px', padding: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+        <div style={{ maxWidth: '560px' }}>
+          <div style={{ fontWeight: 800, fontSize: '18px', marginBottom: '6px' }}>Not sure which service you need?</div>
+          <p style={{ fontSize: '14px', color: 'var(--steel)', lineHeight: 1.6, margin: 0 }}>
+            Describe the problem in your own words — no light, a leaking pipe, a kitchen to build — and our guided finder will match you to the right service or artisan in under a minute.
+          </p>
+        </div>
+        <Link to="/service-finder" style={{ background: 'var(--navy, #0F1B4C)', color: '#fff', fontWeight: 700, fontSize: '14px', padding: '12px 20px', borderRadius: '10px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          🧭 Try the Service Finder
+        </Link>
+      </div>
+
       {/* P2P Artisan Hiring & Negotiation Modal */}
       {negotiatePillar && (
         <ArtisanHireNegotiationModal
