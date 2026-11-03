@@ -179,11 +179,23 @@ export default function Layout() {
                     <strong>All Property Services</strong>
                     <span>Escrow-backed certified maintenance</span>
                   </Link>
-                  <Link to="/services?category=Cleaning" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
-                    <strong>🧹 Industrial &amp; Deep Cleaning</strong>
-                    <span>High-rise facade &amp; floor scrubbing</span>
+                  <Link to="/services?category=Electrical%20%26%20Power" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>⚡ Electrical &amp; Power</strong>
+                    <span>Wiring, solar inverters &amp; generator automation</span>
                   </Link>
-                  <Link to="/services?category=Logistics" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                  <Link to="/services?category=Plumbing%20%26%20Water" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>🚰 Plumbing &amp; Water</strong>
+                    <span>Leak detection, boreholes &amp; fittings</span>
+                  </Link>
+                  <Link to="/services?category=Carpentry%20%26%20Interiors" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>🔨 Carpentry &amp; Interiors</strong>
+                    <span>Kitchens, wardrobes &amp; POP ceilings</span>
+                  </Link>
+                  <Link to="/services?category=Building%20Maintenance" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
+                    <strong>🏠 Building Maintenance</strong>
+                    <span>Painting, waterproofing &amp; surface repairs</span>
+                  </Link>
+                  <Link to="/services?category=Logistics%20Service" className="dropdown-link" onClick={() => setServicesDropdownOpen(false)}>
                     <strong>🚚 Express Logistics</strong>
                     <span>Same-day dispatch across Lagos &amp; Nigeria</span>
                   </Link>
