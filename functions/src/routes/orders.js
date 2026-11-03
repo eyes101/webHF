@@ -92,6 +92,35 @@ export function registerOrderRoutes(app) {
     res.json({ orders, page, limit, total, total_pages: Math.max(1, Math.ceil(total / limit)) });
   });
 
+  // GET /api/orders/track/:id — PUBLIC guest tracking.
+  // Order IDs are unguessable Firestore IDs; the response deliberately
+  // contains only status, dates, and item names — no customer details,
+  // address, notes, totals, or payment information.
+  app.get('/api/orders/track/:id', async (req, res) => {
+    const snap = await db.collection('orders').doc(req.params.id).get();
+    if (!snap.exists) return res.status(404).json({ error: 'Order not found' });
+    const data = snap.data();
+    const toIso = (v) => {
+      if (!v) return null;
+      if (typeof v.toDate === 'function') return v.toDate().toISOString();
+      if (typeof v === 'string') return v;
+      if (v._seconds) return new Date(v._seconds * 1000).toISOString();
+      return null;
+    };
+    res.json({
+      tracking: {
+        id: snap.id,
+        status: data.status,
+        created_at: toIso(data.created_at),
+        updated_at: toIso(data.updated_at),
+        items: (data.items || []).map((i) => ({
+          service_name: i.service_name,
+          quantity: i.quantity,
+        })),
+      },
+    });
+  });
+
   // GET /api/orders/:id
   app.get('/api/orders/:id', requireAuth, async (req, res) => {
     const snap = await db.collection('orders').doc(req.params.id).get();
