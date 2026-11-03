@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Layout from './components/Layout';
+import ToastHost from './components/Toast';
 import HomePage from './pages/HomePage';
 import ShopPage from './pages/ShopPage';
 import BestSellersPage from './pages/BestSellersPage';
@@ -98,6 +99,7 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           <AppRoutes />
+          <ToastHost />
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>
