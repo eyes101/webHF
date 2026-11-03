@@ -1,5 +1,6 @@
 // components/ArtisanHireNegotiationModal.jsx
 import React, { useState, useEffect } from 'react';
+import { showToast } from './Toast';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
@@ -105,7 +106,7 @@ export default function ArtisanHireNegotiationModal({ pillarId, onClose }) {
 
   const handleFundEscrow = () => {
     if (!taskTitle.trim() || !address.trim()) {
-      alert('Please fill in the task details and job site address.');
+      showToast('Please fill in the task details and job site address.');
       return;
     }
 
