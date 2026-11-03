@@ -1,5 +1,6 @@
 ﻿// pages/ShopPage.jsx — Full E-Commerce Catalog & Appliances Store
 import React, { useState, useMemo } from 'react';
+import { showToast } from '../components/Toast';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { MARKETPLACE_ITEMS, MARKETPLACE_CATEGORIES } from '../data/products';
@@ -249,7 +250,7 @@ export default function ShopPage() {
                       <button
                         type="button"
                         className="wishlist-btn"
-                        onClick={(e) => { e.stopPropagation(); alert(`Added ${item.name} to wishlist!`); }}
+                        onClick={(e) => { e.stopPropagation(); showToast(`Added ${item.name} to wishlist!`); }}
                         title="Add to Wishlist"
                       >
                         ♡
