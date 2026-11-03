@@ -21,7 +21,7 @@
   --blue-dim: #DBEAFE;
 
   --steel: #64748B;
-  --steel-light: #94A3B8;
+  --steel-light: #64748B; /* darkened from #94A3B8: small text now meets WCAG AA contrast (4.5:1+) on white */
   --line: #E2E8F0;
   --line-strong: #CBD5E1;
 
@@ -341,4 +341,43 @@ select {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Accessibility: visible keyboard focus everywhere */
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.input:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 1px;
+}
+
+/* Skip link: hidden until a keyboard user tabs to it */
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -60px;
+  z-index: 2000;
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: top 0.15s ease;
+}
+.skip-link:focus-visible {
+  top: 12px;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
