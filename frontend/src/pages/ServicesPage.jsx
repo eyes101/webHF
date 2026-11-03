@@ -74,6 +74,7 @@ export default function ServicesPage() {
   const [allCategories, setAllCategories] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || '';
+  const activeSort = searchParams.get('sort') || 'default';
   const [loading, setLoading] = useState(true);
   const [negotiatePillar, setNegotiatePillar] = useState(null);
   const { addItem } = useCart();
@@ -101,12 +102,39 @@ export default function ServicesPage() {
   }, [activeCategory]);
 
   const handleCategorySelect = (cat) => {
+    const next = new URLSearchParams(searchParams);
     if (!cat) {
-      setSearchParams({});
+      next.delete('category');
     } else {
-      setSearchParams({ category: cat });
+      next.set('category', cat);
     }
+    setSearchParams(next);
   };
+
+  const handleSortSelect = (sort) => {
+    const next = new URLSearchParams(searchParams);
+    if (!sort || sort === 'default') {
+      next.delete('sort');
+    } else {
+      next.set('sort', sort);
+    }
+    setSearchParams(next);
+  };
+
+  const sortedServices = [...services].sort((a, b) => {
+    switch (activeSort) {
+      case 'name-asc':
+        return (a.name || '').localeCompare(b.name || '');
+      case 'name-desc':
+        return (b.name || '').localeCompare(a.name || '');
+      case 'price-asc':
+        return (a.price_cents ?? 0) - (b.price_cents ?? 0);
+      case 'price-desc':
+        return (b.price_cents ?? 0) - (a.price_cents ?? 0);
+      default:
+        return 0; // Keep the API order: category, then name
+    }
+  });
 
   const handleQuickAdd = (e, service) => {
     e.preventDefault();
@@ -279,6 +307,27 @@ export default function ServicesPage() {
         ))}
       </div>
 
+      {/* Sort Control */}
+      <div style={{ marginBottom: '24px', display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <label htmlFor="services-sort" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>
+          Sort by:
+        </label>
+        <select
+          id="services-sort"
+          value={activeSort}
+          onChange={(e) => handleSortSelect(e.target.value)}
+          className="btn btn-sm"
+          style={{ fontSize: '13px', cursor: 'pointer' }}
+          aria-label="Sort services"
+        >
+          <option value="default">Default (Category, then Name)</option>
+          <option value="name-asc">Name: A to Z</option>
+          <option value="name-desc">Name: Z to A</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
+
       {/* Services Grid */}
       {loading ? (
         <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--steel)' }}>
@@ -298,7 +347,7 @@ export default function ServicesPage() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-          {services.map((service) => (
+          {sortedServices.map((service) => (
             <Link
               key={service.id}
               to={`/services/${service.slug}`}
