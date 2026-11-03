@@ -311,6 +311,8 @@ export default function HomePage() {
                     <img
                       src={cat.img}
                       alt={cat.name}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = '/kitchens/kitchen-1.webp';
