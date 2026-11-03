@@ -7,11 +7,11 @@ import './ReceptionistChatBot.css';
 const RECEPTIONIST_RESPONSES = [
   {
     triggers: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'greetings', 'help'],
-    response: `Good day! Welcome to Halfcon House Care & Electronics Sales. My name is Ada from the front-desk reception desk. 😊\n\nIt is my absolute pleasure to assist you today. You can ask me anything about our appliances, home maintenance services, 20% discount code, physical outlets, or hiring verified artisans with escrow protection. How may I help you?`,
+    response: `Good day! Welcome to Halfcon House Care & Electronics Sales. My name is Ada from the front-desk reception desk. 😊\n\nIt is my absolute pleasure to assist you today. You can ask me anything about our appliances, home maintenance services, current offers, physical outlets, or hiring verified artisans with escrow protection. How may I help you?`,
   },
   {
     triggers: ['discount', 'promo', 'coupon', 'code', '20%', 'halfcon20', 'offer', 'cheaper'],
-    response: `You are in luck! 🎉 We are currently running an official **20% Promotional Discount** across all appliances, home care services, and supplies.\n\n• **Promo Code:** \`HALFCON20\`\n• **Applicable on:** Solar inverters, Smart TVs, Inverter ACs, curtains, kitchen cabinetry, and all maintenance tasks.\n• You can apply it directly during checkout or mention it to our dispatch team!`,
+    response: `For current offers, please check the prices shown on the product and service pages — those are the prices that apply at checkout. 🎉\n\nI can't confirm a live promo code here, and our checkout doesn't accept discount codes at the moment. If you've seen an offer advertised, our team on WhatsApp can confirm whether it's still running before you order.`,
   },
   {
     triggers: ['location', 'address', 'where are you', 'office', 'branch', 'store', 'shop', 'ikorodu', 'alaba', 'showroom'],
@@ -23,7 +23,7 @@ const RECEPTIONIST_RESPONSES = [
   },
   {
     triggers: ['product', 'appliance', 'tv', 'solar', 'inverter', 'battery', 'ac', 'fan', 'pump', 'paint', 'curtain', 'blind', 'wire', 'cable'],
-    response: `We stock 100% genuine, brand-new electrical appliances, home cooling, and maintenance materials with official warranties! ⚡📺\n\n• **Solar & Power:** 5KVA Hybrid Inverter Kits, Lithium Batteries, 5000VA Digital AVR Stabilizers.\n• **Home Electronics:** 55" Frameless 4K Smart TVs, Rechargeable Solar Standing Fans, 1.5HP Inverter ACs.\n• **Plumbing & Water:** 1.5HP Deep-Well Borehole Pumps, PN20 PPR Hot/Cold pipes.\n• **Decor & Surface:** Custom Empire Curtains, Motorized Blinds, 20L Weather-Shield Wall Paint, and Bitumen Waterproofing Membrane.\n\nClick on the **"Products"** link at the top to explore all 20% discounted stock!`,
+    response: `We stock 100% genuine, brand-new electrical appliances, home cooling, and maintenance materials with official warranties! ⚡📺\n\n• **Solar & Power:** 5KVA Hybrid Inverter Kits, Lithium Batteries, 5000VA Digital AVR Stabilizers.\n• **Home Electronics:** 55" Frameless 4K Smart TVs, Rechargeable Solar Standing Fans, 1.5HP Inverter ACs.\n• **Plumbing & Water:** 1.5HP Deep-Well Borehole Pumps, PN20 PPR Hot/Cold pipes.\n• **Decor & Surface:** Custom Empire Curtains, Motorized Blinds, 20L Weather-Shield Wall Paint, and Bitumen Waterproofing Membrane.\n\nClick on the **"Products"** link at the top to explore our current stock!`,
   },
   {
     triggers: ['payment', 'pay', 'paystack', 'card', 'bank', 'transfer', 'naira', 'account', 'ussd'],
@@ -31,11 +31,11 @@ const RECEPTIONIST_RESPONSES = [
   },
   {
     triggers: ['track', 'order', 'status', 'where is my order', 'delivery', 'dispatch'],
-    response: `Tracking your order is instant and seamless! 🚚\n\n1. Click **"Track Order"** in the top navigation or enter your **Order ID** (e.g. \`ord_...\`) on our homepage tracking bar.\n2. You can view your real-time 4-stage milestone progress (*Order Placed ➔ Payment Confirmed ➔ In Progress ➔ Completed*).\n3. You can also chat live with our dispatch operations supervisor directly on your tracking screen!`,
+    response: `Here's how to check on an order: 🚚\n\n1. Open the **Track Order** page and enter your **Order ID**.\n2. For full order details, sign in and open **Orders** in your account — you'll be asked to sign in first.\n3. If you'd rather not sign in, message our team on WhatsApp with your Order ID and they can check the status for you.`,
   },
   {
     triggers: ['inspection', 'visit', 'engineer', 'quote', 'estimate', 'site'],
-    response: `We offer **100% Free Senior Engineer Site Visits & Inspections** anywhere in Lagos! 📐🏢\n\nOur project engineer will visit your site, take technical measurements, inspect your electrical load or plumbing lines, and deliver a transparent quotation with our 20% discount applied.\n\nClick **"📅 Book Free Site Visit"** on the homepage to schedule yours!`,
+    response: `We offer **100% Free Senior Engineer Site Visits & Inspections** anywhere in Lagos! 📐🏢\n\nOur project engineer will visit your site, take technical measurements, inspect your electrical load or plumbing lines, and deliver a transparent quotation.\n\nClick **"📅 Book Free Site Visit"** on the homepage to schedule yours!`,
   },
   {
     triggers: ['contact', 'phone', 'whatsapp', 'call', 'talk', 'human', 'agent', 'number', 'email'],
@@ -43,10 +43,10 @@ const RECEPTIONIST_RESPONSES = [
   },
 ];
 
-const DEFAULT_FALLBACK = `Thank you for asking! As the receptionist for Halfcon, I specialize in assisting you with our home care maintenance services, genuine electronics sales, 20% discount codes, store addresses in Ikorodu & Alaba, and verified artisan bookings.\n\nCould you please let me know if you would like assistance with an appliance order, a maintenance service, or contacting our team?`;
+const DEFAULT_FALLBACK = `Thank you for asking! As the receptionist for Halfcon, I specialize in assisting you with our home care maintenance services, genuine electronics sales, current offers, store addresses in Ikorodu & Alaba, and verified artisan bookings.\n\nCould you please let me know if you would like assistance with an appliance order, a maintenance service, or contacting our team?`;
 
 const QUICK_SUGGESTIONS = [
-  '⚡ 20% Discount Code',
+  '🏷️ Current Offers & Discounts',
   '🤝 How to Hire an Artisan',
   '📍 Physical Store Addresses',
   '📺 Products & Appliances List',
@@ -54,6 +54,32 @@ const QUICK_SUGGESTIONS = [
   '📦 How to Track My Order',
   '📞 Talk to Human on WhatsApp',
 ];
+
+// Render the small Markdown subset the bot's answers use — **bold**,
+// *italic*, `code`, and [label](url) — instead of showing the raw characters.
+function renderInline(text) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={i}>{part.slice(1, -1)}</code>;
+    }
+    const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (link) {
+      return (
+        <a key={i} href={link[2]} target="_blank" rel="noopener noreferrer">
+          {link[1]}
+        </a>
+      );
+    }
+    return part;
+  });
+}
 
 export default function ReceptionistChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -140,7 +166,7 @@ export default function ReceptionistChatBot() {
             setIsOpen(true);
             setHasInteracted(true);
           }}
-          aria-label="Open Halfcon Reception Desk AI Chat"
+          aria-label="Open Halfcon Reception Desk Chat"
         >
           <div className="trigger-pulse-ring" />
           <div className="trigger-avatar-circle">
@@ -149,7 +175,7 @@ export default function ReceptionistChatBot() {
           </div>
           <div className="trigger-label-pill">
             <span className="trigger-label-title">Reception Desk</span>
-            <span className="trigger-label-sub">Ask Ada · Online</span>
+            <span className="trigger-label-sub">Ask Ada · Quick help</span>
           </div>
         </button>
       )}
@@ -166,7 +192,7 @@ export default function ReceptionistChatBot() {
               </div>
               <div>
                 <div className="reception-name">Ada &middot; Halfcon Reception</div>
-                <div className="reception-title">Front-Desk AI Assistant &middot; 24/7</div>
+                <div className="reception-title">Front-Desk Assistant &middot; Quick answers</div>
               </div>
             </div>
 
@@ -193,7 +219,7 @@ export default function ReceptionistChatBot() {
 
           {/* Quick Notice Banner */}
           <div className="reception-banner">
-            <span>⚡ Use code <strong>HALFCON20</strong> for 20% OFF all orders</span>
+            <span>💬 Need a human? Tap the WhatsApp icon above to reach our team.</span>
           </div>
 
           {/* Message Stream */}
@@ -228,7 +254,7 @@ export default function ReceptionistChatBot() {
                         );
                       }
 
-                      return <p key={pIdx} style={{ margin: '0 0 4px 0' }}>{paragraph}</p>;
+                      return <p key={pIdx} style={{ margin: '0 0 4px 0' }}>{renderInline(paragraph)}</p>;
                     })}
                   </div>
                   <span className="bubble-timestamp">{msg.time}</span>
