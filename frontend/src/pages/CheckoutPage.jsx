@@ -230,10 +230,11 @@ export default function CheckoutPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, marginBottom: '6px' }}>
+                <label htmlFor="checkout-address" style={{ display: 'block', fontSize: '13px', fontWeight: 700, marginBottom: '6px' }}>
                   Execution / Delivery Address *
                 </label>
                 <textarea
+                  id="checkout-address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="input"
@@ -244,10 +245,11 @@ export default function CheckoutPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, marginBottom: '6px' }}>
+                <label htmlFor="checkout-schedule" style={{ display: 'block', fontSize: '13px', fontWeight: 700, marginBottom: '6px' }}>
                   Preferred Execution Date / Time (Optional)
                 </label>
                 <input
+                  id="checkout-schedule"
                   type="text"
                   value={scheduledFor}
                   onChange={(e) => setScheduledFor(e.target.value)}
@@ -265,10 +267,11 @@ export default function CheckoutPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, marginBottom: '6px' }}>
+                <label htmlFor="checkout-notes" style={{ display: 'block', fontSize: '13px', fontWeight: 700, marginBottom: '6px' }}>
                   Special Instructions / Cargo Notes
                 </label>
                 <textarea
+                  id="checkout-notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="input"
