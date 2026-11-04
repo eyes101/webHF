@@ -1,9 +1,8 @@
 // src/routes/payments.js
-// Same provider-agnostic flow as before — see original backend/src/routes/payments.js
-// for the full design rationale. Ported to Firestore; webhook signature
-// verification unchanged (Cloud Functions gives us req.rawBody automatically,
-// which is exactly what HMAC verification needs).
-import { db, admin } from '../firestore.js';
+// Provider-agnostic payment flow: `manual` test mode or Paystack.
+// Webhook signature verification is unchanged (HMAC-SHA512 of the raw body);
+// the server entry points capture req.rawBody for us.
+import { supabase, newId, nowIso } from '../db.js';
 import { requireAuth, requireRole } from '../middleware/requireAuth.js';
 import crypto from 'node:crypto';
 
@@ -11,32 +10,43 @@ const PAYMENT_PROVIDER = process.env.PAYMENT_PROVIDER || 'manual';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+async function getOrder(id) {
+  const { data } = await supabase.from('orders').select('*').eq('id', id).maybeSingle();
+  return data;
+}
+
+async function markPaymentSucceeded(paymentId, orderId) {
+  await supabase.from('payments').update({ status: 'succeeded' }).eq('id', paymentId);
+  await supabase.from('orders').update({ status: 'paid', updated_at: nowIso() }).eq('id', orderId);
+}
+
 export function registerPaymentRoutes(app) {
   // POST /api/orders/:id/checkout — customer starts payment for their order
   app.post('/api/orders/:id/checkout', requireAuth, async (req, res) => {
-    const orderRef = db.collection('orders').doc(req.params.id);
-    const orderSnap = await orderRef.get();
-    if (!orderSnap.exists) return res.status(404).json({ error: 'Order not found' });
-    const order = orderSnap.data();
+    const order = await getOrder(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.user_id !== req.user.id) return res.status(403).json({ error: 'Forbidden' });
     if (!['pending', 'awaiting_payment'].includes(order.status)) {
       return res.status(400).json({ error: `Order is already ${order.status}` });
     }
 
-    const paymentRef = db.collection('payments').doc();
+    const paymentId = newId();
 
     if (PAYMENT_PROVIDER === 'manual') {
-      await paymentRef.set({
-        order_id: orderRef.id, provider: 'manual', provider_ref: `manual_${paymentRef.id.slice(0, 8)}`,
+      const { error } = await supabase.from('payments').insert({
+        id: paymentId,
+        order_id: order.id, provider: 'manual', provider_ref: `manual_${paymentId.slice(0, 8)}`,
         amount_cents: order.total_cents, currency: order.currency, status: 'initiated',
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
       });
-      await orderRef.update({ status: 'awaiting_payment', updated_at: admin.firestore.FieldValue.serverTimestamp() });
+      if (error) return res.status(500).json({ error: 'Could not create payment' });
+      await supabase.from('orders')
+        .update({ status: 'awaiting_payment', updated_at: nowIso() })
+        .eq('id', order.id);
 
       return res.json({
         mode: 'manual_test',
         message: 'Test-mode checkout created. Call POST /api/payments/:id/simulate-success to complete it.',
-        payment_id: paymentRef.id,
+        payment_id: paymentId,
         amount_cents: order.total_cents,
         currency: order.currency,
       });
@@ -46,7 +56,7 @@ export function registerPaymentRoutes(app) {
       if (!PAYSTACK_SECRET_KEY) {
         return res.status(500).json({ error: 'PAYMENT_PROVIDER=paystack but PAYSTACK_SECRET_KEY is not set' });
       }
-      const reference = `halfcon_${paymentRef.id}`;
+      const reference = `halfcon_${paymentId}`;
       let paystackRes;
       try {
         paystackRes = await fetch('https://api.paystack.co/transaction/initialize', {
@@ -57,8 +67,8 @@ export function registerPaymentRoutes(app) {
             amount: order.total_cents,
             currency: order.currency,
             reference,
-            callback_url: `${FRONTEND_URL}/orders/${orderRef.id}?paid=1`,
-            metadata: { order_id: orderRef.id, payment_id: paymentRef.id },
+            callback_url: `${FRONTEND_URL}/orders/${order.id}?paid=1`,
+            metadata: { order_id: order.id, payment_id: paymentId },
           }),
         });
       } catch (err) {
@@ -70,15 +80,18 @@ export function registerPaymentRoutes(app) {
         return res.status(502).json({ error: `Paystack error: ${paystackData.message || 'unknown error'}` });
       }
 
-      await paymentRef.set({
-        order_id: orderRef.id, provider: 'paystack', provider_ref: reference,
+      const { error } = await supabase.from('payments').insert({
+        id: paymentId,
+        order_id: order.id, provider: 'paystack', provider_ref: reference,
         amount_cents: order.total_cents, currency: order.currency, status: 'initiated',
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
       });
-      await orderRef.update({ status: 'awaiting_payment', updated_at: admin.firestore.FieldValue.serverTimestamp() });
+      if (error) return res.status(500).json({ error: 'Could not create payment' });
+      await supabase.from('orders')
+        .update({ status: 'awaiting_payment', updated_at: nowIso() })
+        .eq('id', order.id);
 
       return res.json({
-        mode: 'paystack', payment_id: paymentRef.id, checkout_url: paystackData.data.authorization_url,
+        mode: 'paystack', payment_id: paymentId, checkout_url: paystackData.data.authorization_url,
         amount_cents: order.total_cents, currency: order.currency,
       });
     }
@@ -91,13 +104,13 @@ export function registerPaymentRoutes(app) {
     if (PAYMENT_PROVIDER !== 'manual') {
       return res.status(400).json({ error: 'Only available when PAYMENT_PROVIDER=manual (test mode)' });
     }
-    const paymentRef = db.collection('payments').doc(req.params.id);
-    const paymentSnap = await paymentRef.get();
-    if (!paymentSnap.exists) return res.status(404).json({ error: 'Payment not found' });
+    const { data: payment } = await supabase
+      .from('payments').select('*').eq('id', req.params.id).maybeSingle();
+    if (!payment) return res.status(404).json({ error: 'Payment not found' });
 
-    await markPaymentSucceeded(paymentRef.id, paymentSnap.data().order_id);
-    const orderSnap = await db.collection('orders').doc(paymentSnap.data().order_id).get();
-    res.json({ ok: true, order: { id: orderSnap.id, ...orderSnap.data() } });
+    await markPaymentSucceeded(payment.id, payment.order_id);
+    const order = await getOrder(payment.order_id);
+    res.json({ ok: true, order });
   });
 
   // POST /api/webhooks/payment — real provider webhook target (Paystack)
@@ -113,7 +126,8 @@ export function registerPaymentRoutes(app) {
     }
 
     const signature = req.headers['x-paystack-signature'];
-    const expectedSignature = crypto.createHmac('sha512', PAYSTACK_SECRET_KEY).update(req.rawBody).digest('hex');
+    const rawBody = req.rawBody || Buffer.from(JSON.stringify(req.body || {}));
+    const expectedSignature = crypto.createHmac('sha512', PAYSTACK_SECRET_KEY).update(rawBody).digest('hex');
     if (!signature || signature !== expectedSignature) {
       return res.status(401).json({ error: 'Invalid signature' });
     }
@@ -121,9 +135,11 @@ export function registerPaymentRoutes(app) {
     const event = req.body;
     if (event.event === 'charge.success') {
       const reference = event.data.reference;
-      const snap = await db.collection('payments').where('provider_ref', '==', reference).limit(1).get();
-      if (!snap.empty && snap.docs[0].data().status !== 'succeeded') {
-        await markPaymentSucceeded(snap.docs[0].id, snap.docs[0].data().order_id);
+      const { data } = await supabase
+        .from('payments').select('*').eq('provider_ref', reference).limit(1);
+      const payment = data && data[0];
+      if (payment && payment.status !== 'succeeded') {
+        await markPaymentSucceeded(payment.id, payment.order_id);
       }
     }
     res.status(200).json({ received: true });
@@ -147,11 +163,13 @@ export function registerPaymentRoutes(app) {
       }
 
       if (verifyData.data.status === 'success') {
-        const snap = await db.collection('payments').where('provider_ref', '==', reference).limit(1).get();
-        if (!snap.empty) {
-          await markPaymentSucceeded(snap.docs[0].id, snap.docs[0].data().order_id);
-          const orderSnap = await db.collection('orders').doc(snap.docs[0].data().order_id).get();
-          return res.json({ ok: true, status: 'succeeded', order: { id: orderSnap.id, ...orderSnap.data() } });
+        const { data } = await supabase
+          .from('payments').select('*').eq('provider_ref', reference).limit(1);
+        const payment = data && data[0];
+        if (payment) {
+          await markPaymentSucceeded(payment.id, payment.order_id);
+          const order = await getOrder(payment.order_id);
+          return res.json({ ok: true, status: 'succeeded', order });
         }
       }
 
@@ -163,12 +181,9 @@ export function registerPaymentRoutes(app) {
 
   // GET /api/admin/payments — staff view of all payments
   app.get('/api/admin/payments', requireAuth, requireRole('staff', 'admin'), async (req, res) => {
-    const snap = await db.collection('payments').orderBy('created_at', 'desc').get();
-    res.json({ payments: snap.docs.map((d) => ({ id: d.id, ...d.data() })) });
+    const { data, error } = await supabase
+      .from('payments').select('*').order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: 'Could not load payments' });
+    res.json({ payments: data || [] });
   });
-
-  async function markPaymentSucceeded(paymentId, orderId) {
-    await db.collection('payments').doc(paymentId).update({ status: 'succeeded' });
-    await db.collection('orders').doc(orderId).update({ status: 'paid', updated_at: admin.firestore.FieldValue.serverTimestamp() });
-  }
 }

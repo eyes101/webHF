@@ -19,7 +19,11 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+// Capture the raw body so the Paystack webhook can verify its
+// HMAC signature against exactly what was sent (Migration M2).
+app.use(express.json({
+  verify: (req, res, buf) => { req.rawBody = buf; },
+}));
 
 // Health check endpoint for Google Cloud Run and Load Balancers
 app.get('/api/health', (req, res) => {

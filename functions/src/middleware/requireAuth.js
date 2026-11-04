@@ -1,71 +1,97 @@
 // src/middleware/requireAuth.js
 //
-// Every request carries `Authorization: Bearer <firebase-id-token>`. We
-// verify it with firebase-admin (which checks the signature, expiry, and
-// project match). The user's `role` (customer/staff/admin) lives in
-// Firestore, so we look it up and attach it to req.user. If this is the
-// very first time we've seen this uid, we auto-create their profile doc.
-import { admin, db } from '../firestore.js';
+// Every request carries `Authorization: Bearer <supabase-access-token>`. We
+// verify it with Supabase Auth and attach the caller's profile to req.user.
+// The user's `role` (customer/staff/admin) lives in the `profiles` table.
+// If this is the very first time we've seen this user, we create their
+// profile — honouring any pre-seeded role in `role_reservations` (matched
+// by email, e.g. an admin account reserved before they first signed in).
+import { supabase } from '../db.js';
+
+async function loadOrCreateProfile(authUser) {
+  const email = (authUser.email || '').toLowerCase();
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', authUser.id)
+    .maybeSingle();
+  if (existing) return existing;
+
+  let role = 'customer';
+  if (email) {
+    const { data: reservation } = await supabase
+      .from('role_reservations')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
+    if (reservation) role = reservation.role;
+  }
+
+  const meta = authUser.user_metadata || {};
+  const profile = {
+    id: authUser.id,
+    name: meta.full_name || meta.name || (email ? email.split('@')[0] : 'Customer'),
+    email,
+    phone: authUser.phone || meta.phone || null,
+    avatar_url: meta.avatar_url || meta.picture || null,
+    role,
+    email_verified: Boolean(authUser.email_confirmed_at),
+  };
+  const { data: created, error } = await supabase
+    .from('profiles')
+    .insert(profile)
+    .select()
+    .single();
+  if (error) {
+    // Lost a race with a parallel first request — re-read the row.
+    const { data: reread } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUser.id)
+      .maybeSingle();
+    if (reread) return reread;
+    throw error;
+  }
+  return created;
+}
+
+function toReqUser(profile, authUser) {
+  return {
+    id: authUser.id,
+    name: profile.name,
+    email: profile.email,
+    role: profile.role || 'customer',
+    email_verified: Boolean(authUser.email_confirmed_at || profile.email_verified),
+  };
+}
 
 export async function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
-  const idToken = header.startsWith('Bearer ') ? header.slice(7) : null;
-  if (!idToken) {
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) {
     return res.status(401).json({ error: 'Not authenticated', code: 'auth/not-authenticated' });
   }
 
-  let decoded;
+  let authUser;
   try {
-    decoded = await admin.auth().verifyIdToken(idToken);
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error || !data.user) throw error || new Error('no user');
+    authUser = data.user;
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired session', code: 'auth/invalid-session' });
   }
 
-  if (!decoded.email) {
+  if (!authUser.email) {
     return res.status(401).json({ error: 'Account has no email address associated', code: 'auth/no-email' });
   }
 
-  const userRef = db.collection('users').doc(decoded.uid);
-  let userSnap = await userRef.get();
-
-  if (!userSnap.exists) {
-    // First time seeing this uid — check for a pre-seeded row matching this
-    // email (e.g. an admin account reserved before they first signed in).
-    const byEmail = await db.collection('users').where('email', '==', decoded.email.toLowerCase()).limit(1).get();
-    if (!byEmail.empty) {
-      const existing = byEmail.docs[0];
-      await userRef.set({ ...existing.data(), uid: decoded.uid }, { merge: true });
-      if (existing.id !== decoded.uid) await existing.ref.delete();
-      userSnap = await userRef.get();
-    } else {
-      await userRef.set({
-        uid: decoded.uid,
-        name: decoded.name || decoded.email.split('@')[0],
-        email: decoded.email.toLowerCase(),
-        phone: decoded.phone_number || null,
-        avatar_url: decoded.picture || null,
-        role: 'customer',
-        email_verified: Boolean(decoded.email_verified),
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      userSnap = await userRef.get();
-    }
-  } else {
-    // Sync email_verified status if updated
-    if (decoded.email_verified && !userSnap.data()?.email_verified) {
-      await userRef.update({ email_verified: true }).catch(() => {});
-    }
+  try {
+    const profile = await loadOrCreateProfile(authUser);
+    req.user = toReqUser(profile, authUser);
+    next();
+  } catch (err) {
+    return res.status(500).json({ error: 'Could not load user profile' });
   }
-
-  const data = userSnap.data() || {};
-  req.user = {
-    id: decoded.uid,
-    name: data.name || decoded.name || decoded.email.split('@')[0],
-    email: data.email || decoded.email,
-    role: data.role || 'customer',
-    email_verified: Boolean(decoded.email_verified),
-  };
-  next();
 }
 
 export function requireVerifiedEmail(req, res, next) {
@@ -90,20 +116,17 @@ export function requireRole(...roles) {
 // For public routes that behave slightly differently if caller is logged in
 export async function optionalAuth(req, res, next) {
   const header = req.headers.authorization || '';
-  const idToken = header.startsWith('Bearer ') ? header.slice(7) : null;
-  if (!idToken) return next();
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) return next();
   try {
-    const decoded = await admin.auth().verifyIdToken(idToken);
-    const userSnap = await db.collection('users').doc(decoded.uid).get();
-    if (userSnap.exists) {
-      const data = userSnap.data() || {};
-      req.user = {
-        id: decoded.uid,
-        name: data.name || decoded.name || decoded.email.split('@')[0],
-        email: data.email || decoded.email,
-        role: data.role || 'customer',
-        email_verified: Boolean(decoded.email_verified),
-      };
+    const { data } = await supabase.auth.getUser(token);
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      if (profile) req.user = toReqUser(profile, data.user);
     }
   } catch {
     // Invalid token on optional-auth route — proceed unauthenticated
