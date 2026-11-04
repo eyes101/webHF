@@ -1,11 +1,13 @@
 // pages/CartPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, total } = useCart();
+  const { items, removeItem, updateQuantity, total, promo, applyPromo, removePromo, discount, finalTotal } = useCart();
+  const [promoInput, setPromoInput] = useState('');
+  const [promoError, setPromoError] = useState('');
   const navigate = useNavigate();
 
   if (items.length === 0) {
@@ -150,12 +152,53 @@ export default function CartPage() {
               <span>Escrow &amp; Insurance Protection</span>
               <span style={{ color: 'var(--green)', fontWeight: 600 }}>Free</span>
             </div>
+            {promo && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'var(--green)', fontWeight: 600 }}>
+                <span>Promo {promo.code} (−{promo.percent}%)</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>−{formatNaira(discount)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Promo code */}
+          <div style={{ marginBottom: '20px' }}>
+            {promo ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', background: 'var(--paper-dim)', borderRadius: 'var(--radius-md)', padding: '10px 12px' }}>
+                <span><strong>{promo.code}</strong> applied — {promo.percent}% off</span>
+                <button type="button" onClick={removePromo} style={{ background: 'none', border: 'none', color: 'var(--rust)', fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}>Remove</button>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => { setPromoInput(e.target.value); setPromoError(''); }}
+                    placeholder="Promo code (e.g. HALFCON20)"
+                    aria-label="Promo code"
+                    style={{ flex: 1, padding: '10px 12px', fontSize: '13px', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', textTransform: 'uppercase' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-sm"
+                    onClick={() => {
+                      const res = applyPromo(promoInput);
+                      if (!res.ok) setPromoError(res.error);
+                      else setPromoInput('');
+                    }}
+                  >
+                    Apply
+                  </button>
+                </div>
+                {promoError && <p style={{ fontSize: '12px', color: 'var(--rust)', marginTop: '6px' }}>{promoError}</p>}
+              </>
+            )}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '28px' }}>
             <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink)' }}>Total (NGN)</span>
             <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '28px', fontWeight: 900, color: 'var(--ink)' }}>
-              {formatNaira(total)}
+              {formatNaira(finalTotal)}
             </span>
           </div>
 

@@ -1,11 +1,10 @@
 // pages/SettingsPage.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { auth } from '../config/firebase';
-import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { supabase } from '../config/supabase';
 
 export default function SettingsPage() {
-  const { user, isEmailVerified, resendVerificationEmail, reloadUser } = useAuth();
+  const { user, authUser, isEmailVerified, resendVerificationEmail, reloadUser } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,8 +13,9 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState('');
   const [resendStatus, setResendStatus] = useState('');
 
-  const currentUser = auth.currentUser;
-  const hasPasswordProvider = currentUser?.providerData?.some((p) => p.providerId === 'password');
+  const hasPasswordProvider =
+    authUser?.app_metadata?.providers?.includes('email') ||
+    authUser?.identities?.some((i) => i.provider === 'email');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,9 +33,15 @@ export default function SettingsPage() {
 
     setLoading(true);
     try {
-      const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
-      await reauthenticateWithCredential(currentUser, credential);
-      await updatePassword(currentUser, newPassword);
+      // Supabase has no separate re-authenticate call: verify the current
+      // password with a sign-in, then set the new password on the session.
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: authUser.email,
+        password: currentPassword,
+      });
+      if (verifyError) throw Object.assign(new Error(verifyError.message), { code: 'auth/wrong-password' });
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
       setSuccess('Password updated successfully.');
       setCurrentPassword('');
       setNewPassword('');
@@ -65,7 +71,7 @@ export default function SettingsPage() {
   const handleCheckStatus = async () => {
     setResendStatus('Checking verification status...');
     const refreshed = await reloadUser();
-    if (refreshed?.emailVerified) {
+    if (refreshed?.email_confirmed_at) {
       setResendStatus('Email is verified! Thank you.');
     } else {
       setResendStatus('Your email is still marked unverified. Please check your inbox.');

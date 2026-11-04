@@ -6,7 +6,7 @@ import { api } from '../api/client';
 import { formatNaira } from '../utils/currency';
 
 export default function CheckoutPage() {
-  const { items, total, clear } = useCart();
+  const { items, total, clear, promo, discount, finalTotal } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -71,11 +71,12 @@ export default function CheckoutPage() {
         })),
         notes,
         address,
-        scheduledFor
+        scheduledFor,
+        promo ? promo.code : null
       );
       createdOrderId = res.order.id;
       setOrderId(res.order.id);
-      setOrderTotal(total);
+      setOrderTotal(res.order.total_cents != null ? res.order.total_cents : finalTotal);
       clear();
       localStorage.removeItem('halfcon_draft_address');
       localStorage.removeItem('halfcon_draft_schedule');
@@ -290,7 +291,7 @@ export default function CheckoutPage() {
             style={{ width: '100%' }}
           >
             {loading ? <span className="spinner" style={{ width: '20px', height: '20px', borderTopColor: '#fff' }} /> : null}
-            {loading ? 'Creating Order & Starting Payment...' : `Place Order & Pay — ${formatNaira(total)}`}
+            {loading ? 'Creating Order & Starting Payment...' : `Place Order & Pay — ${formatNaira(finalTotal)}`}
           </button>
         </form>
 
@@ -314,10 +315,23 @@ export default function CheckoutPage() {
             ))}
           </div>
 
+          {promo && (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'var(--steel)', marginBottom: '8px' }}>
+                <span>Subtotal</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{formatNaira(total)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'var(--green)', fontWeight: 600, marginBottom: '16px' }}>
+                <span>Promo {promo.code} (−{promo.percent}%)</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>−{formatNaira(discount)}</span>
+              </div>
+            </>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
             <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink)' }}>Total Payable</span>
             <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '28px', fontWeight: 900, color: 'var(--ink)' }}>
-              {formatNaira(total)}
+              {formatNaira(finalTotal)}
             </span>
           </div>
 
