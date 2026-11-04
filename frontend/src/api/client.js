@@ -1,31 +1,39 @@
-﻿// api/client.js
-// Universal robust API client with Cloud Functions proxy, direct Firestore & LocalStorage fallbacks
-import { auth, db } from '../config/firebase';
-import { doc, collection, setDoc, getDoc, getDocs, query, where, serverTimestamp, updateDoc } from 'firebase/firestore';
+// api/client.js
+// API client for the Halfcon backend. Auth tokens come from the Supabase
+// session. (Migration M3: the old direct-Firestore fallbacks are gone —
+// Firestore denied client access anyway, so they never worked. A
+// localStorage copy of the customer's own orders remains as a read-only
+// safety net when the API is unreachable.)
+import { supabase } from '../config/supabase';
 
 const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/api`
-  : 'https://us-central1-tigertrigger-c1e0a.cloudfunctions.net/api';
+  : '/api';
+
+async function authHeaders() {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
 
 async function apiFetch(endpoint, options = {}) {
-  const url = `${API_BASE}${endpoint}`;
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
-
-  if (auth.currentUser) {
-    try {
-      const idToken = await auth.currentUser.getIdToken();
-      headers.Authorization = `Bearer ${idToken}`;
-    } catch (e) {
-      console.warn('Failed to retrieve Firebase ID token:', e);
-    }
-  }
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(await authHeaders()),
+    ...options.headers,
+  };
 
   let res;
   try {
-    res = await fetch(url, { ...options, headers });
+    res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
   } catch (netErr) {
-    // If external domain fails, try local relative /api path
-    if (url.startsWith('https://')) {
+    // If an absolute API URL fails at the network level, retry the
+    // relative /api path (same-origin proxies / rewrites).
+    if (API_BASE.startsWith('https://')) {
       try {
         res = await fetch(`/api${endpoint}`, { ...options, headers });
       } catch (e2) {
@@ -46,7 +54,8 @@ async function apiFetch(endpoint, options = {}) {
   return data;
 }
 
-// Local Orders Storage Helper
+// Local Orders Storage Helper — read-only safety net for the customer's
+// own orders (mirrors successful API creates).
 function getLocalOrders() {
   try {
     return JSON.parse(localStorage.getItem('halfcon_orders') || '[]');
@@ -93,73 +102,13 @@ export const api = {
       apiFetch(`/admin/artisans/${id}`, { method: 'DELETE' }),
   },
   orders: {
-    create: async (items, notes, address, scheduled_for) => {
-      // 1. Try Cloud Functions API
-      try {
-        const res = await apiFetch('/orders', {
-          method: 'POST',
-          body: JSON.stringify({ items, notes, address, scheduled_for }),
-        });
-        if (res.order) {
-          saveLocalOrder(res.order);
-          return res;
-        }
-      } catch (err) {
-        console.warn('Backend API orders.create returned error, using resilient Firestore fallback:', err);
-      }
-
-      // 2. Direct Firestore & Client-Side Resilient Creation
-      const user = auth.currentUser;
-      const orderId = `ord_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      
-      let totalCents = 0;
-      const resolvedItems = items.map((item) => {
-        const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
-        const price = parseInt(item.price_cents, 10) || 0;
-        const subtotal = price * qty;
-        totalCents += subtotal;
-        return {
-          service_id: item.service_id || item.id || 'item',
-          service_name: item.name || 'Service / Appliance',
-          service_category: item.category || 'General',
-          quantity: qty,
-          unit_price_cents: price,
-          subtotal_cents: subtotal,
-        };
+    create: async (items, notes, address, scheduled_for, promoCode) => {
+      const res = await apiFetch('/orders', {
+        method: 'POST',
+        body: JSON.stringify({ items, notes, address, scheduled_for, promo_code: promoCode || undefined }),
       });
-
-      const orderData = {
-        id: orderId,
-        user_id: user ? user.uid : 'guest',
-        user_email: user ? user.email : '',
-        status: 'pending',
-        total_cents: totalCents,
-        currency: 'NGN',
-        notes: notes || null,
-        address: address || null,
-        scheduled_for: scheduled_for || null,
-        items: resolvedItems,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        payments: [],
-      };
-
-      // Write to Firestore if available
-      try {
-        if (db) {
-          const orderRef = doc(collection(db, 'orders'), orderId);
-          await setDoc(orderRef, {
-            ...orderData,
-            created_at: serverTimestamp(),
-            updated_at: serverTimestamp(),
-          });
-        }
-      } catch (firestoreErr) {
-        console.warn('Firestore write warning:', firestoreErr);
-      }
-
-      saveLocalOrder(orderData);
-      return { order: orderData };
+      if (res.order) saveLocalOrder(res.order);
+      return res;
     },
 
     list: async (status, page = 1, limit = 20) => {
@@ -169,10 +118,8 @@ export const api = {
         const res = await apiFetch(`/orders?${params.toString()}`);
         if (res.orders) return res;
       } catch (err) {
-        console.warn('Backend API orders.list returned error, using local/Firestore fallback:', err);
+        console.warn('orders.list API unavailable, using local safety net:', err);
       }
-
-      // Firestore or Local Fallback
       const local = getLocalOrders();
       return { orders: local, total: local.length, page: 1, limit };
     },
@@ -182,79 +129,58 @@ export const api = {
         const res = await apiFetch(`/orders/${id}`);
         if (res.order) return res;
       } catch (err) {
-        console.warn('Backend API orders.get returned error, using local/Firestore fallback:', err);
+        console.warn('orders.get API unavailable, using local safety net:', err);
       }
-
-      // Try Firestore directly
-      try {
-        if (db) {
-          const docSnap = await getDoc(doc(db, 'orders', id));
-          if (docSnap.exists()) {
-            return { order: { id: docSnap.id, ...docSnap.data() } };
-          }
-        }
-      } catch (e) {
-        console.warn('Direct Firestore get failed:', e);
-      }
-
-      // Check local storage
       const local = getLocalOrders().find((o) => o.id === id);
-      if (local) {
-        return { order: local };
-      }
-
+      if (local) return { order: local };
       throw new Error(`Order ${id} not found.`);
     },
 
-    updateStatus: async (id, status) => {
+    track: async (id) => {
+      const clean = (id || '').trim();
       try {
-        return await apiFetch(`/orders/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status }),
-        });
+        return await apiFetch(`/orders/track/${encodeURIComponent(clean)}`);
       } catch (err) {
-        console.warn('updateStatus API fallback to local/Firestore:', err);
-        if (db) {
-          await updateDoc(doc(db, 'orders', id), { status, updated_at: serverTimestamp() }).catch(() => {});
+        const local = getLocalOrders().find((o) => o.id === clean);
+        if (local) {
+          return {
+            tracking: {
+              id: local.id,
+              status: local.status,
+              created_at: local.created_at,
+              updated_at: local.updated_at,
+              items: (local.items || []).map((i) => ({
+                service_name: i.service_name,
+                quantity: i.quantity,
+              })),
+            },
+          };
         }
-        const local = getLocalOrders();
-        const found = local.find((o) => o.id === id);
-        if (found) {
-          found.status = status;
-          saveLocalOrder(found);
-        }
-        return { success: true };
+        throw err;
       }
+    },
+
+    updateStatus: async (id, status) => {
+      const res = await apiFetch(`/orders/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+      // Mirror the change into the local safety-net copy, if one exists.
+      const local = getLocalOrders().find((o) => o.id === id);
+      if (local) {
+        local.status = status;
+        saveLocalOrder(local);
+      }
+      return res;
     },
   },
 
   payments: {
-    checkout: async (orderId) => {
-      try {
-        const res = await apiFetch(`/orders/${orderId}/checkout`, { method: 'POST' });
-        if (res.payment_id || res.checkout_url) return res;
-      } catch (err) {
-        console.warn('Backend payments.checkout fallback:', err);
-      }
+    checkout: (orderId) =>
+      apiFetch(`/orders/${orderId}/checkout`, { method: 'POST' }),
 
-      // Resilient simulated checkout fallback
-      const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      return {
-        mode: 'simulate',
-        payment_id: paymentId,
-        order_id: orderId,
-        amount_cents: 0,
-      };
-    },
-
-    simulateSuccess: async (paymentId) => {
-      try {
-        return await apiFetch(`/payments/${paymentId}/simulate-success`, { method: 'POST' });
-      } catch (err) {
-        console.warn('Backend payments.simulateSuccess fallback:', err);
-        return { success: true, status: 'paid', payment_id: paymentId };
-      }
-    },
+    simulateSuccess: (paymentId) =>
+      apiFetch(`/payments/${paymentId}/simulate-success`, { method: 'POST' }),
 
     verify: (reference) =>
       apiFetch(`/payments/verify/${encodeURIComponent(reference)}`),

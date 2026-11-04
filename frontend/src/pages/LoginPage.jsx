@@ -25,7 +25,35 @@ export default function LoginPage() {
     sendPasswordReset,
     resendVerificationEmail,
     reloadUser,
+    passwordRecovery,
+    updatePassword,
   } = useAuth();
+
+  const [newPassword, setNewPassword] = useState('');
+
+  React.useEffect(() => {
+    if (passwordRecovery) setMode('reset');
+  }, [passwordRecovery]);
+
+  const handleSetNewPassword = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      setFormError('Password must be at least 6 characters.');
+      return;
+    }
+    setFormError('');
+    setFormSuccess('');
+    setLoading(true);
+    try {
+      await updatePassword(newPassword);
+      setMode('login');
+      setFormSuccess('Password updated. You can now sign in with your new password.');
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -113,7 +141,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const refreshed = await reloadUser();
-      if (refreshed?.emailVerified) {
+      if (refreshed?.email_confirmed_at) {
         setResendSuccess('Email verified successfully! You now have full access.');
       } else {
         setFormError('Your email still appears unverified. Please click the link in your email first.');
@@ -128,7 +156,37 @@ export default function LoginPage() {
   return (
     <div className="auth-page-container">
       <div className="auth-card">
-        {mode === 'login' ? (
+        {mode === 'reset' ? (
+          <>
+            <div className="auth-header">
+              <h1 className="auth-title">Set a New Password</h1>
+              <p className="auth-subtitle">Choose a new password for your Halfcon account</p>
+            </div>
+            {formError && (
+              <div className="auth-alert auth-alert-error"><div>{formError}</div></div>
+            )}
+            {formSuccess && (
+              <div className="auth-alert auth-alert-success"><div>{formSuccess}</div></div>
+            )}
+            <form onSubmit={handleSetNewPassword} className="auth-form">
+              <div className="auth-form-group">
+                <label className="auth-label" htmlFor="new-password">New password</label>
+                <input
+                  id="new-password"
+                  type="password"
+                  className="auth-input"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  required
+                />
+              </div>
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
+                {loading ? 'Updating...' : 'Update Password'}
+              </button>
+            </form>
+          </>
+        ) : mode === 'login' ? (
           <>
             <div className="auth-header">
               <h1 className="auth-title">Welcome Back</h1>
