@@ -199,6 +199,10 @@ export default function Layout() {
               ARTISANS
             </Link>
 
+            <Link to="/request-service" className={`nav-item ${isActive('/request-service') || isActive('/service-request') ? 'active' : ''}`}>
+              REQUEST A SERVICE
+            </Link>
+
             <Link to="/about" className={`nav-item ${isActive('/about') ? 'active' : ''}`}>
               ABOUT US
             </Link>
@@ -306,6 +310,7 @@ export default function Layout() {
               <Link to="/new-arrivals" className="m-link" onClick={() => setMenuOpen(false)}>✨ New Arrivals</Link>
               <Link to="/services" className="m-link" onClick={() => setMenuOpen(false)}>Services Hub</Link>
               <Link to="/artisans" className="m-link" onClick={() => setMenuOpen(false)}>Verified Artisans</Link>
+              <Link to="/request-service" className="m-link" onClick={() => setMenuOpen(false)}>📋 Request a Service</Link>
               <Link to="/about" className="m-link" onClick={() => setMenuOpen(false)}>About Us</Link>
               <Link to="/contact" className="m-link" onClick={() => setMenuOpen(false)}>Contact &amp; Outlets</Link>
               <Link to="/track" className="m-link" onClick={() => setMenuOpen(false)}>Track My Order</Link>

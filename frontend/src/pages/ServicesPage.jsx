@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/currency';
 import ArtisanHireNegotiationModal from '../components/ArtisanHireNegotiationModal';
+import ServiceRequestDrawer from '../components/ServiceRequestDrawer';
 
 const PROPERTY_PILLARS = [
   {
@@ -77,6 +78,7 @@ export default function ServicesPage() {
   const activeSort = searchParams.get('sort') || 'default';
   const [loading, setLoading] = useState(true);
   const [negotiatePillar, setNegotiatePillar] = useState(null);
+  const [requestDrawer, setRequestDrawer] = useState({ open: false, category: '', serviceName: '' });
   const { addItem } = useCart();
   const [addedItem, setAddedItem] = useState(null);
 
@@ -144,6 +146,16 @@ export default function ServicesPage() {
     setTimeout(() => setAddedItem(null), 2500);
   };
 
+  const openRequestDrawer = (category = '', serviceName = '') => {
+    setRequestDrawer({ open: true, category, serviceName });
+  };
+
+  const handleCardRequest = (e, service) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openRequestDrawer(service.category || '', service.name || '');
+  };
+
   return (
     <div className="wrap" style={{ padding: '48px 24px 80px' }}>
       {/* Page Header */}
@@ -182,6 +194,14 @@ export default function ServicesPage() {
         <p style={{ color: 'var(--steel)', fontSize: '16px', lineHeight: 1.6 }}>
           Professional home maintenance, technician repairs, genuine electrical &amp; electronics supplies, and express logistics across Nigeria.
         </p>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '20px' }}>
+          <button type="button" className="btn btn-solid" onClick={() => openRequestDrawer(activeCategory)}>
+            📋 Request a Service
+          </button>
+          <Link to="/request-service" className="btn btn-ghost" style={{ textDecoration: 'none' }}>
+            Open the Request Page →
+          </Link>
+        </div>
       </div>
 
       {/* 4-COLUMN HOME MAINTENANCE & REPAIR PILLARS WITH P2P ARTISAN HIRING */}
@@ -426,6 +446,15 @@ export default function ServicesPage() {
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <button
                       type="button"
+                      onClick={(e) => handleCardRequest(e, service)}
+                      className="btn btn-sm btn-ghost"
+                      style={{ padding: '6px 10px', fontSize: '11px', fontWeight: 700 }}
+                      title="Describe this job and get a WhatsApp reply"
+                    >
+                      📋 Request
+                    </button>
+                    <button
+                      type="button"
                       onClick={(e) => handleQuickAdd(e, service)}
                       className={`btn btn-sm ${addedItem === service.id ? 'btn-green' : 'btn-solid'}`}
                       style={{ padding: '6px 14px', fontSize: '12px', fontWeight: 700 }}
@@ -439,6 +468,47 @@ export default function ServicesPage() {
           ))}
         </div>
       )}
+
+      {/* Can't find it? — request banner (mirrors HireSphere's services-page banner) */}
+      <section
+        className="card"
+        style={{
+          marginTop: '48px',
+          padding: '28px',
+          background: '#0F1B4C',
+          color: '#ffffff',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '20px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ maxWidth: '560px' }}>
+          <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: '24px', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
+            Can't find what you're looking for?
+          </h2>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
+            Describe the job instead — pick a category, tell us what you need and where, and Halfcon Operations will reply on WhatsApp. No booking fee.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button type="button" className="btn btn-solid" onClick={() => openRequestDrawer(activeCategory)}>
+            📋 Request It Here
+          </button>
+          <Link to="/request-service" className="btn btn-ghost" style={{ textDecoration: 'none', color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}>
+            Request Page →
+          </Link>
+        </div>
+      </section>
+
+      {/* Slide-out Service Request Drawer */}
+      <ServiceRequestDrawer
+        open={requestDrawer.open}
+        onClose={() => setRequestDrawer((d) => ({ ...d, open: false }))}
+        initialCategory={requestDrawer.category}
+        initialServiceName={requestDrawer.serviceName}
+      />
 
       {/* P2P Artisan Hiring & Negotiation Modal */}
       {negotiatePillar && (

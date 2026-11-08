@@ -16,6 +16,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import KitchensPage from './pages/KitchensPage';
 import ServicesPage from './pages/ServicesPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
+import RequestServicePage from './pages/RequestServicePage';
 import ArtisansPage from './pages/ArtisansPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -76,6 +77,8 @@ function AppRoutes() {
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/services/:slug" element={<ServiceDetailPage />} />
+        <Route path="/request-service" element={<RequestServicePage />} />
+        <Route path="/service-request" element={<RequestServicePage />} />
         <Route path="/artisans" element={<ArtisansPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />

@@ -1,0 +1,87 @@
+/* ServiceRequestDrawer — slide-out request panel (right edge) */
+
+.sr-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+}
+
+.sr-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 35, 0.55);
+  animation: sr-drawer-fade-in 0.25s ease;
+}
+
+.sr-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(440px, 100vw);
+  background: #ffffff;
+  box-shadow: -12px 0 32px rgba(10, 15, 35, 0.28);
+  display: flex;
+  flex-direction: column;
+  animation: sr-drawer-slide-in 0.32s cubic-bezier(0.22, 0.9, 0.32, 1);
+}
+
+.sr-drawer-header {
+  position: relative;
+  background: #0f1b4c;
+  color: #ffffff;
+  padding: 22px 24px 18px;
+  flex-shrink: 0;
+}
+
+.sr-drawer-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sr-drawer-close:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.sr-drawer-body {
+  padding: 22px 24px 28px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+@keyframes sr-drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sr-drawer-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-drawer-panel,
+  .sr-drawer-backdrop {
+    animation: none;
+  }
+}
